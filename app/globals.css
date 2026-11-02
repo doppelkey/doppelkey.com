@@ -1,26 +1,448 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #1d222c;
+  --cream: #f5f1e8;
+  --paper: #fffdf9;
+  --line: #ded8cb;
+  --orange: #ffad19;
+  --teal: #18a99d;
+  --muted: #656872;
 }
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-noto-sans), sans-serif;
+  font-size: 1.05vw;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+.page-shell {
+  min-width: 320px;
+  overflow: hidden;
+}
+.content-wrap,
+.site-header {
+  width: 83.4%;
+  margin: 0 auto;
+}
+.hero-section {
+  background: var(--cream);
+  min-height: 39.5vw;
+}
+.site-header {
+  height: 5.2vw;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand,
+h1,
+h2,
+h3,
+.puzzle-card h2,
+.button {
+  font-family: var(--font-paytone-one), sans-serif;
+}
+.brand {
+  font-size: 1.35vw;
+}
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 2.4vw;
+  font-size: 0.75vw;
+}
+.main-nav a:not(.button) {
+  color: #4f535b;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--orange);
+  border: 1px solid var(--orange);
+  border-radius: 7px;
+  padding: 0.68em 1.5em;
+  font-size: 0.85vw;
+  white-space: nowrap;
+}
+.button-small {
+  padding: 0.65em 1.25em;
+}
+.button-outline {
+  background: transparent;
+  border-color: var(--ink);
+}
+.hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3.2vw 0 4.1vw;
+}
+.hero-copy {
+  width: 48%;
+}
+.eyebrow {
+  margin: 0 0 1.2vw;
+  font-size: 0.65vw;
+  letter-spacing: 0.14em;
+  color: #62656c;
+}
+h1 {
+  margin: 0;
+  font-size: 4vw;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+.hero-description {
+  width: 70%;
+  margin: 1.8vw 0 1.5vw;
+  color: var(--muted);
+  line-height: 1.45;
+  font-size: 0.9vw;
+}
+.hero-actions {
+  display: flex;
+  gap: 1vw;
+}
+.puzzle-card {
+  width: 41.5%;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 3.2vw 3vw 2.5vw;
+}
+.puzzle-meta {
+  font-size: 1vw;
+  color: #52565f;
+  margin-bottom: 2.4vw;
+}
+.puzzle-card h2 {
+  font-size: 4.2vw;
+  line-height: 1;
+  margin: 0 0 1.4vw;
+}
+.key-summary {
+  margin: 0 0 1.8vw;
+  font-size: 1vw;
+}
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 0.55vw;
+}
+.key {
+  height: 5vw;
+  border-radius: 7px;
+  background: #e4ded2;
+  display: grid;
+  grid-template-rows: 1fr auto auto 1fr;
+  justify-items: center;
+}
+.key strong {
+  font-size: 1.4vw;
+  line-height: 1;
+  grid-row: 2;
+}
+.key span {
+  font-size: 1.2vw;
+  grid-row: 3;
+}
+.key-active {
+  background: var(--orange);
+}
+.puzzle-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.35vw;
+  margin-top: 0.9vw;
+}
+.status {
+  border-radius: 5px;
+  padding: 0.55em 0.85em;
+  font-size: 0.7vw;
+  font-weight: 800;
+}
+.status-teal {
+  background: var(--teal);
+}
+.status-missing {
+  border: 1px dashed #777a80;
+  color: #777a80;
+}
+.found-copy {
+  color: #777a80;
+  font-size: 0.72vw;
+  margin-left: 0.1vw;
+}
+.how-section {
+  padding: 6.5vw 0 6.6vw;
+  background: var(--paper);
+}
+.how-section h2 {
+  margin: 0 0 2.6vw;
+  font-size: 2.75vw;
+}
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4vw;
+}
+.step {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 2.1vw 2.2vw 2.2vw;
+  min-height: 11.5vw;
+}
+.step-number {
+  display: grid;
+  place-items: center;
+  width: 2.5vw;
+  height: 2.5vw;
+  background: var(--orange);
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 1.15vw;
+}
+.step h3 {
+  margin: 1.3vw 0 0.8vw;
+  font-size: 1.6vw;
+}
+.step p,
+.example-copy p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+  font-size: 1.2vw;
+}
+.example-section {
+  background: var(--cream);
+  padding: 6.5vw 0;
+}
+.example-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.example-copy {
+  width: 42%;
+}
+.example-copy h2 {
+  margin: 0 0 1.1vw;
+  font-size: 2.8vw;
+  line-height: 1.1;
+}
+.word-example {
+  width: 50%;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 2.2vw 2.7vw;
+}
+.word-example strong {
+  font-family: var(--font-paytone-one), sans-serif;
+  font-size: 1.8vw;
+}
+.word-list {
+  display: flex;
+  gap: 0.6vw;
+  margin-top: 1.4vw;
+}
+.word-list span {
+  background: var(--teal);
+  border-radius: 5px;
+  padding: 0.6em 0.85em;
+  font-weight: 800;
+  font-size: 1.15vw;
+}
+.cta-section {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 5.5vw 0;
+}
+.cta-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cta-content h2 {
+  margin: 0;
+  font-size: 2.8vw;
+}
+.site-footer {
+  background: var(--cream);
+  padding: 1.7vw 0;
+}
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.footer-content strong {
+  display: block;
+  font-family: var(--font-paytone-one), sans-serif;
+  font-size: 0.9vw;
+}
+.footer-content small {
+  display: block;
+  color: #777a80;
+  margin-top: 0.25vw;
+  font-size: 0.55vw;
+}
+.footer-content nav {
+  display: flex;
+  gap: 1.5vw;
+  color: #60636a;
+  font-size: 0.55vw;
+}
+@media (max-width: 600px) {
+  .content-wrap,
+  .site-header {
+    width: 86%;
+  }
+  .site-header {
+    height: 72px;
+  }
+  .main-nav {
+    gap: 12px;
+  }
+  .main-nav a:not(.button) {
+    display: none;
+  }
+  .hero-section {
+    min-height: auto;
+  }
+  .hero-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 42px;
+    padding: 48px 0 56px;
+  }
+  .hero-copy,
+  .puzzle-card,
+  .example-copy,
+  .word-example {
+    width: 100%;
+  }
+  .hero-copy {
+    max-width: 430px;
+  }
+  .eyebrow {
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: clamp(38px, 12vw, 60px);
+  }
+  .hero-description {
+    width: 90%;
+    margin: 24px 0 20px;
+  }
+  .puzzle-card {
+    max-width: 430px;
+    padding: 6vw 6vw 5vw;
+  }
+  .puzzle-meta {
+    margin-bottom: 4vw;
+    font-size: 2.4vw;
+  }
+  .puzzle-card h2 {
+    font-size: 11vw;
+    margin-bottom: 3vw;
+  }
+  .key-summary {
+    margin-bottom: 3vw;
+    font-size: 2.6vw;
+  }
+  .key {
+    height: 13vw;
+  }
+  .key strong {
+    font-size: 4vw;
+  }
+  .key span {
+    font-size: 4vw;
+  }
+  .how-section,
+  .example-section {
+    padding: 12vw 0;
+  }
+  .how-section h2 {
+    margin-bottom: 6vw;
+    font-size: 7vw;
+  }
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .step {
+    padding: 5vw;
+    min-height: 0;
+  }
+  .step-number {
+    width: 7vw;
+    height: 7vw;
+    font-size: 3.2vw;
+  }
+  .step h3 {
+    margin: 4vw 0 2vw;
+    font-size: 5vw;
+  }
+  .step p,
+  .example-copy p {
+    font-size: 3.5vw;
+  }
+  .example-layout {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+  }
+  .word-example {
+    padding: 6vw;
+  }
+  .word-example strong {
+    font-size: 5vw;
+  }
+  .word-list {
+    gap: 2vw;
+    flex-wrap: wrap;
+  }
+  .word-list span {
+    font-size: 3.5vw;
+  }
+  .cta-section {
+    padding: 9vw 0;
+  }
+  .cta-content h2 {
+    font-size: 7vw;
+  }
+  .cta-content {
+    align-items: flex-start;
+    gap: 20px;
+    flex-direction: column;
+  }
+  .site-footer {
+    padding: 24px 0;
+  }
+  .footer-content {
+    align-items: flex-start;
+    gap: 20px;
+    flex-direction: column;
+  }
+  .footer-content nav {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
 }

@@ -1,69 +1,170 @@
-import Image from "next/image";
+const keys = [
+  ["1", ""],
+  ["2", "ABC"],
+  ["3", "DEF"],
+  ["4", "GHI"],
+  ["5", "JKL"],
+  ["6", "MNO"],
+  ["7", "PQRS"],
+  ["8", "TUV"],
+  ["9", "WXYZ"],
+];
+
+function Header() {
+  return (
+    <header className="site-header">
+      <a className="brand" href="#top">
+        Doppelkey
+      </a>
+      <nav className="main-nav">
+        <a href="#how-it-works">How to play</a>
+        <a href="#archive">Archive</a>
+        <a href="#about">About</a>
+        <a className="button button-small" href="#puzzle">
+          Play today
+        </a>
+      </nav>
+    </header>
+  );
+}
+
+function PuzzleCard() {
+  return (
+    <div className="puzzle-card" id="puzzle">
+      <div className="puzzle-meta">Puzzle No. 42</div>
+      <h2>HOLE</h2>
+      <p className="key-summary">Keys 4 · 6 · 5 · 3</p>
+      <div className="keypad">
+        {keys.map(([number, letters]) => (
+          <div
+            className={`key ${["3", "4", "5", "6"].includes(number) ? "key-active" : ""}`}
+            key={number}
+          >
+            <strong>{number}</strong>
+            <span>{letters}</span>
+          </div>
+        ))}
+      </div>
+      <div className="puzzle-footer">
+        <span className="status status-teal">GOLF</span>
+        <span className="status status-teal">HOLD</span>
+        <span className="status status-missing">?</span>
+        <span className="found-copy">2 of 3 twins found</span>
+      </div>
+    </div>
+  );
+}
+
+function HowItWorks() {
+  const steps = [
+    [
+      "1",
+      "See today's word",
+      "A new word appears each day, along with the phone keys that spell it.",
+    ],
+    [
+      "2",
+      "Read the keys",
+      "Each key stands for three or four letters. Work out what else those keys can spell.",
+    ],
+    [
+      "3",
+      "Find the twins",
+      "Type every other real word that uses the same keys. Find them all to finish the day.",
+    ],
+  ];
+  return (
+    <section className="how-section" id="how-it-works">
+      <div className="content-wrap">
+        <h2>How it works</h2>
+        <div className="steps-grid">
+          {steps.map(([number, title, copy]) => (
+            <article className="step" key={number}>
+              <span className="step-number">{number}</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="page-shell" id="top">
+      <section className="hero-section">
+        <Header />
+        <div className="content-wrap hero-content">
+          <div className="hero-copy">
+            <p className="eyebrow">A DAILY KEYPAD WORD PUZZLE</p>
+            <h1>
+              Find the words
+              <br />
+              that share a<br />
+              keypad
+            </h1>
+            <p className="hero-description">
+              Every day brings one word. Find every other real word typed with
+              the same phone keys. It takes about a minute.
+            </p>
+            <div className="hero-actions">
+              <a className="button" href="#puzzle">
+                Play today's puzzle
+              </a>
+              <a className="button button-outline" href="#how-it-works">
+                How it works
+              </a>
+            </div>
+          </div>
+          <PuzzleCard />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+      </section>
+      <HowItWorks />
+      <section className="example-section" id="archive">
+        <div className="content-wrap example-layout">
+          <div className="example-copy">
+            <h2>Same keys, different words</h2>
+            <p>
+              Press 4, 6, 5, 3 and you can spell hole, hold, gold, or golf. That
+              is a twin set, and your job is to find them all.
+            </p>
+          </div>
+          <div className="word-example">
+            <strong>4 · 6 · 5 · 3</strong>
+            <div className="word-list">
+              <span>HOLE</span>
+              <span>HOLD</span>
+              <span>GOLD</span>
+              <span>GOLF</span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="cta-section" id="about">
+        <div className="content-wrap cta-content">
+          <h2>Ready for today's puzzle?</h2>
+          <a className="button" href="#puzzle">
+            Play today
           </a>
         </div>
-      </main>
+      </section>
+      <footer className="site-footer">
+        <div className="content-wrap footer-content">
+          <div>
+            <strong>Doppelkey</strong>
+            <small>© 2026 Doppelkey. A daily keypad word puzzle.</small>
+          </div>
+          <nav>
+            <a href="#how-it-works">How to play</a>
+            <a href="#archive">Archive</a>
+            <a href="#about">About</a>
+            <a href="#privacy">Privacy</a>
+            <a href="#contact">Contact</a>
+          </nav>
+        </div>
+      </footer>
     </div>
   );
 }
