@@ -2,11 +2,28 @@ import type { Metadata } from "next";
 import { Noto_Sans, Paytone_One } from "next/font/google";
 import "./globals.css";
 
-const notoSans = Noto_Sans({ variable: "--font-noto-sans", subsets: ["latin"] });
-const paytoneOne = Paytone_One({ variable: "--font-paytone-one", subsets: ["latin"], weight: "400" });
+const notoSans = Noto_Sans({
+  variable: "--font-noto-sans",
+  subsets: ["latin"],
+});
+const paytoneOne = Paytone_One({
+  variable: "--font-paytone-one",
+  subsets: ["latin"],
+  weight: "400",
+});
 
-export const metadata: Metadata = { title: "Doppelkey | A daily keypad word puzzle", description: "Find the words that share a keypad." };
+export const metadata: Metadata = {
+  title: "Doppelkey | A daily keypad word puzzle",
+  description: "Find the words that share a keypad.",
+};
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  return <html lang="en" className={`${notoSans.variable} ${paytoneOne.variable} h-full antialiased`}><body className="min-h-full flex flex-col">{children}</body></html>;
+  return (
+    <html
+      lang="en"
+      className={`${notoSans.variable} ${paytoneOne.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col">{children}</body>
+    </html>
+  );
 }
