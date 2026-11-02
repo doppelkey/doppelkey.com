@@ -126,6 +126,12 @@ h1 {
 .puzzle-meta {
   font-size: 1vw;
   color: #52565f;
+  margin: 0;
+}
+.puzzle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 2.4vw;
 }
 .puzzle-card h2 {
@@ -149,8 +155,9 @@ h1 {
   50% { opacity: 0; }
 }
 .key-summary {
-  margin: 0 0 1.8vw;
-  font-size: 1vw;
+  margin: 0;
+  font-size: 1.2vw;
+  font-family: var(--font-paytone-one), sans-serif;
 }
 .keypad {
   display: grid;
@@ -182,8 +189,9 @@ h1 {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  width: max-content;
-  min-width: 100%;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
   gap: 0.35vw;
   margin-top: 0.9vw;
 }
@@ -375,8 +383,10 @@ h1 {
     padding: 6vw 6vw 5vw;
   }
   .puzzle-meta {
-    margin-bottom: 4vw;
     font-size: 2.4vw;
+  }
+  .puzzle-header {
+    margin-bottom: 4vw;
   }
   .puzzle-card h2 {
     font-size: 11vw;
