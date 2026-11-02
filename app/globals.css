@@ -140,24 +140,25 @@ h1 {
 .keypad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   gap: 0.55vw;
 }
 .key {
   height: 5vw;
   border-radius: 7px;
   background: #e4ded2;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  grid-template-rows: 1fr auto auto 1fr;
+  justify-items: center;
 }
 .key strong {
   font-size: 1.4vw;
   line-height: 1;
+  grid-row: 2;
 }
 .key span {
   font-size: 1.2vw;
-  margin-top: 0.5vw;
+  grid-row: 3;
 }
 .key-active {
   background: var(--orange);
@@ -373,7 +374,6 @@ h1 {
   }
   .key span {
     font-size: 4vw;
-    margin-top: 1vw;
   }
   .how-section,
   .example-section {
