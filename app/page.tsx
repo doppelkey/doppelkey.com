@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 const keys = [
   ["1", ""],
   ["2", "ABC"],
@@ -9,6 +13,19 @@ const keys = [
   ["8", "TUV"],
   ["9", "WXYZ"],
 ];
+const puzzleDigits = ["2", "4", "7", "9"];
+const wordBank = [
+  "AIRY",
+  "WAYS",
+  "WIRY",
+  "HAIR",
+  "AIRWAY",
+  "AIRWAYS",
+  "HAIRY",
+  "RAYS",
+  "WARY",
+  "HAYS",
+];
 
 function Header() {
   return (
@@ -18,7 +35,7 @@ function Header() {
       </a>
       <nav className="main-nav">
         <a href="#how-it-works">How to play</a>
-        <a href="#archive">Archive</a>
+        <a href="#archive">Examples</a>
         <a href="#about">About</a>
         <a className="button button-small" href="#puzzle">
           Play today
@@ -29,15 +46,50 @@ function Header() {
 }
 
 function PuzzleCard() {
+  const [typedWord, setTypedWord] = useState("");
+  const [wordList, setWordList] = useState(wordBank);
+
+  useEffect(() => {
+    let letterIndex = 0;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const typeWord = (word: string) => {
+      if (letterIndex < word.length) {
+        letterIndex += 1;
+        setTypedWord(word.slice(0, letterIndex));
+        timer = setTimeout(() => typeWord(word), 180);
+        return;
+      }
+
+      const nextList = [word, ...wordListRef.current.slice(0, -1)];
+      wordListRef.current = nextList;
+      setWordList(nextList);
+      timer = setTimeout(() => {
+        letterIndex = 0;
+        setTypedWord("");
+        typeWord(nextList[nextList.length - 1]);
+      }, 900);
+    };
+
+    const wordListRef = { current: [...wordBank] };
+    typeWord(wordListRef.current[wordListRef.current.length - 1]);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="puzzle-card" id="puzzle">
-      <div className="puzzle-meta">Puzzle No. 42</div>
-      <h2>HOLE</h2>
-      <p className="key-summary">Keys 4 · 6 · 5 · 3</p>
+      <div className="puzzle-header">
+        <div className="puzzle-meta">Today's digits</div>
+        <p className="key-summary">2 4 7 9</p>
+      </div>
+      <h2 className="typing-word" aria-live="polite">
+        {typedWord}
+        <span className="typing-caret" aria-hidden="true" />
+      </h2>
       <div className="keypad">
         {keys.map(([number, letters]) => (
           <div
-            className={`key ${["3", "4", "5", "6"].includes(number) ? "key-active" : ""}`}
+            className={`key ${puzzleDigits.includes(number) ? "key-active" : ""}`}
             key={number}
           >
             <strong>{number}</strong>
@@ -46,10 +98,11 @@ function PuzzleCard() {
         ))}
       </div>
       <div className="puzzle-footer">
-        <span className="status status-teal">GOLF</span>
-        <span className="status status-teal">HOLD</span>
-        <span className="status status-missing">?</span>
-        <span className="found-copy">2 of 3 twins found</span>
+        {wordList.map((word, index) => (
+          <span className="status status-teal" key={`${word}-${index}`}>
+            {word}
+          </span>
+        ))}
       </div>
     </div>
   );
@@ -59,18 +112,18 @@ function HowItWorks() {
   const steps = [
     [
       "1",
-      "See today's word",
-      "A new word appears each day, along with the phone keys that spell it.",
+      "Get four digits",
+      "Each puzzle starts with four unique digits chosen from the keypad.",
     ],
     [
       "2",
-      "Read the keys",
-      "Each key stands for three or four letters. Work out what else those keys can spell.",
+      "Read the letters",
+      "Use the letters attached to those digits. Every letter and digit can be used more than once.",
     ],
     [
       "3",
-      "Find the twins",
-      "Type every other real word that uses the same keys. Find them all to finish the day.",
+      "Build your words",
+      "Make real words with four or more letters. Find as many as you can before time runs out.",
     ],
   ];
   return (
@@ -98,20 +151,21 @@ export default function Home() {
         <Header />
         <div className="content-wrap hero-content">
           <div className="hero-copy">
-            <p className="eyebrow">A DAILY KEYPAD WORD PUZZLE</p>
+            <p className="eyebrow">A DAILY DIGIT WORD PUZZLE</p>
             <h1>
-              Find the words
+              Build words
               <br />
-              that share a<br />
-              keypad
+              from four<br />
+              digits
             </h1>
             <p className="hero-description">
-              Every day brings one word. Find every other real word typed with
-              the same phone keys. It takes about a minute.
+              Four unique digits are your only clues. Use their letters to
+              build words of four or more letters, reusing any letter as often
+              as you like.
             </p>
             <div className="hero-actions">
               <a className="button" href="#puzzle">
-                Play today's puzzle
+                Try today's digits
               </a>
               <a className="button button-outline" href="#how-it-works">
                 How it works
@@ -125,26 +179,27 @@ export default function Home() {
       <section className="example-section" id="archive">
         <div className="content-wrap example-layout">
           <div className="example-copy">
-            <h2>Same keys, different words</h2>
+            <h2>Four digits, many words</h2>
             <p>
-              Press 4, 6, 5, 3 and you can spell hole, hold, gold, or golf. That
-              is a twin set, and your job is to find them all.
+              Start with 2, 4, 7, and 9. Their letters can make airy, ways,
+              wiry, hair, and more. Repeat letters and digits freely, but every word must
+              be at least four letters long.
             </p>
           </div>
           <div className="word-example">
-            <strong>4 · 6 · 5 · 3</strong>
+            <strong>2 4 7 9</strong>
             <div className="word-list">
-              <span>HOLE</span>
-              <span>HOLD</span>
-              <span>GOLD</span>
-              <span>GOLF</span>
+              <span>AIRY</span>
+              <span>WAYS</span>
+              <span>WIRY</span>
+              <span>HAIR</span>
             </div>
           </div>
         </div>
       </section>
       <section className="cta-section" id="about">
         <div className="content-wrap cta-content">
-          <h2>Ready for today's puzzle?</h2>
+          <h2>Ready to find your words?</h2>
           <a className="button" href="#puzzle">
             Play today
           </a>
@@ -154,11 +209,11 @@ export default function Home() {
         <div className="content-wrap footer-content">
           <div>
             <strong>Doppelkey</strong>
-            <small>© 2026 Doppelkey. A daily keypad word puzzle.</small>
+            <small>© 2026 Doppelkey. A daily digit word puzzle.</small>
           </div>
           <nav>
             <a href="#how-it-works">How to play</a>
-            <a href="#archive">Archive</a>
+            <a href="#archive">Examples</a>
             <a href="#about">About</a>
             <a href="#privacy">Privacy</a>
             <a href="#contact">Contact</a>

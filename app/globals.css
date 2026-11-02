@@ -126,6 +126,12 @@ h1 {
 .puzzle-meta {
   font-size: 1vw;
   color: #52565f;
+  margin: 0;
+}
+.puzzle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 2.4vw;
 }
 .puzzle-card h2 {
@@ -133,9 +139,25 @@ h1 {
   line-height: 1;
   margin: 0 0 1.4vw;
 }
+.typing-word {
+  min-height: 1em;
+}
+.typing-caret {
+  display: inline-block;
+  width: 0.12em;
+  height: 0.85em;
+  margin-left: 0.08em;
+  background: var(--ink);
+  vertical-align: -0.05em;
+  animation: caret-blink 0.9s steps(2, start) infinite;
+}
+@keyframes caret-blink {
+  50% { opacity: 0; }
+}
 .key-summary {
-  margin: 0 0 1.8vw;
-  font-size: 1vw;
+  margin: 0;
+  font-size: 1.2vw;
+  font-family: var(--font-paytone-one), sans-serif;
 }
 .keypad {
   display: grid;
@@ -166,6 +188,10 @@ h1 {
 .puzzle-footer {
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
   gap: 0.35vw;
   margin-top: 0.9vw;
 }
@@ -174,6 +200,8 @@ h1 {
   padding: 0.55em 0.85em;
   font-size: 0.7vw;
   font-weight: 800;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 .status-teal {
   background: var(--teal);
@@ -355,8 +383,10 @@ h1 {
     padding: 6vw 6vw 5vw;
   }
   .puzzle-meta {
-    margin-bottom: 4vw;
     font-size: 2.4vw;
+  }
+  .puzzle-header {
+    margin-bottom: 4vw;
   }
   .puzzle-card h2 {
     font-size: 11vw;
