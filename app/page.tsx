@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 const keys = [
   ["1", ""],
   ["2", "ABC"],
@@ -10,6 +14,18 @@ const keys = [
   ["9", "WXYZ"],
 ];
 const puzzleDigits = ["2", "4", "7", "9"];
+const wordBank = [
+  "AIRY",
+  "WAYS",
+  "WIRY",
+  "HAIR",
+  "AIRWAY",
+  "AIRWAYS",
+  "HAIRY",
+  "RAYS",
+  "WARY",
+  "HAYS",
+];
 
 function Header() {
   return (
@@ -30,10 +46,43 @@ function Header() {
 }
 
 function PuzzleCard() {
+  const [typedWord, setTypedWord] = useState("");
+  const [wordList, setWordList] = useState(wordBank);
+
+  useEffect(() => {
+    let letterIndex = 0;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const typeWord = (word: string) => {
+      if (letterIndex < word.length) {
+        letterIndex += 1;
+        setTypedWord(word.slice(0, letterIndex));
+        timer = setTimeout(() => typeWord(word), 180);
+        return;
+      }
+
+      const nextList = [word, ...wordListRef.current.slice(0, -1)];
+      wordListRef.current = nextList;
+      setWordList(nextList);
+      timer = setTimeout(() => {
+        letterIndex = 0;
+        setTypedWord("");
+        typeWord(nextList[nextList.length - 1]);
+      }, 900);
+    };
+
+    const wordListRef = { current: [...wordBank] };
+    typeWord(wordListRef.current[wordListRef.current.length - 1]);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="puzzle-card" id="puzzle">
       <div className="puzzle-meta">Today's digits</div>
-      <h2>AIRY</h2>
+      <h2 className="typing-word" aria-live="polite">
+        {typedWord}
+        <span className="typing-caret" aria-hidden="true" />
+      </h2>
       <p className="key-summary">2 · 4 · 7 · 9</p>
       <div className="keypad">
         {keys.map(([number, letters]) => (
@@ -47,10 +96,11 @@ function PuzzleCard() {
         ))}
       </div>
       <div className="puzzle-footer">
-        <span className="status status-teal">WAYS</span>
-        <span className="status status-teal">WIRY</span>
-        <span className="status status-missing">?</span>
-        <span className="found-copy">3 words found</span>
+        {wordList.map((word, index) => (
+          <span className="status status-teal" key={`${word}-${index}`}>
+            {word}
+          </span>
+        ))}
       </div>
     </div>
   );
