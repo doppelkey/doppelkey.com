@@ -6,7 +6,7 @@
   --paper: #fffdf9;
   --line: #ded8cb;
   --orange: #ffad19;
-  --teal: #18a99d;
+  --teal: var(--orange);
   --muted: #656872;
 }
 * {
@@ -377,6 +377,7 @@ h1 {
   .hero-description {
     width: 90%;
     margin: 24px 0 20px;
+    font-size: 3.5vw;
   }
   .puzzle-card {
     max-width: 430px;
@@ -393,7 +394,7 @@ h1 {
     margin-bottom: 3vw;
   }
   .key-summary {
-    margin-bottom: 3vw;
+    margin: 0;
     font-size: 2.6vw;
   }
   .key {

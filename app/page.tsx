@@ -80,7 +80,7 @@ function PuzzleCard() {
     <div className="puzzle-card" id="puzzle">
       <div className="puzzle-header">
         <div className="puzzle-meta">Today's digits</div>
-        <p className="key-summary">2 4 7 9</p>
+        <p className="key-summary">2 · 4 · 7 · 9</p>
       </div>
       <h2 className="typing-word" aria-live="polite">
         {typedWord}
@@ -187,7 +187,7 @@ export default function Home() {
             </p>
           </div>
           <div className="word-example">
-            <strong>2 4 7 9</strong>
+            <strong>2 · 4 · 7 · 9</strong>
             <div className="word-list">
               <span>AIRY</span>
               <span>WAYS</span>
