@@ -156,8 +156,8 @@ h1 {
   line-height: 1;
 }
 .key span {
-  font-size: 0.6vw;
-  margin-top: 0.35vw;
+  font-size: 1.2vw;
+  margin-top: 0.5vw;
 }
 .key-active {
   background: var(--orange);
@@ -372,7 +372,7 @@ h1 {
     font-size: 4vw;
   }
   .key span {
-    font-size: 1.8vw;
+    font-size: 4vw;
     margin-top: 1vw;
   }
   .how-section,
