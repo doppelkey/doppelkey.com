@@ -13,8 +13,8 @@ const paytoneOne = Paytone_One({
 });
 
 export const metadata: Metadata = {
-  title: "Doppelkey | A daily keypad word puzzle",
-  description: "Find the words that share a keypad.",
+  title: "Doppelkey | A daily digit word puzzle",
+  description: "Build words of four or more letters from four keypad digits.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
