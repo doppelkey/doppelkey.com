@@ -234,44 +234,57 @@ export default function Game() {
                   {mounted ? digits.join(" · ") : ""}
                 </p>
               </div>
-              <div className="keypad">
-                {KEYS.map(([number, letters]) => (
-                  <div
-                    className={`key ${digits.includes(number) ? "key-active" : ""} ${letters ? "key-interactive" : ""}`}
-                    key={number}
-                    role={letters ? "button" : undefined}
-                    tabIndex={letters ? 0 : undefined}
-                    onClick={() => pressKeypadKey(number)}
-                    onKeyDown={(event) => {
-                      if (letters && (event.key === "Enter" || event.key === " ")) {
-                        event.preventDefault();
-                        pressKeypadKey(number);
-                      }
-                    }}
-                  >
-                    <strong>{number}</strong>
-                    <span>{letters}</span>
+              <form className="keypad-form" onSubmit={submitWord}>
+                <div className="typing-shell">
+                  <div className="typing-word" aria-hidden="true">
+                    {input ? (
+                      input.toUpperCase()
+                    ) : gameOver ? (
+                      <span className="typing-placeholder">Time is up</span>
+                    ) : null}
+                    <span className="typing-caret" aria-hidden="true" />
                   </div>
-                ))}
-              </div>
-            </div>
-            <div className="game-panel panel-entry">
-              <p className="panel-label">Build a word</p>
-              <form className="word-form" onSubmit={submitWord}>
-                <input
-                  ref={inputRef}
-                  className="word-input"
-                  type="text"
-                  value={input}
-                  onChange={(event) => handleInputChange(event.target.value)}
-                  placeholder={gameOver ? "Time is up" : "Type or tap letters"}
-                  autoComplete="off"
-                  autoCapitalize="characters"
+                  <input
+                    ref={inputRef}
+                    className="typing-input"
+                    type="text"
+                    value={input}
+                    onChange={(event) => handleInputChange(event.target.value)}
+                    autoComplete="off"
+                    autoCapitalize="characters"
+                    disabled={!mounted || gameOver}
+                    aria-label="Word built from today's digits"
+                  />
+                </div>
+                <div className="keypad">
+                  {KEYS.map(([number, letters]) => (
+                    <div
+                      className={`key ${digits.includes(number) ? "key-active" : ""} ${letters ? "key-interactive" : ""}`}
+                      key={number}
+                      role={letters ? "button" : undefined}
+                      tabIndex={letters ? 0 : undefined}
+                      onClick={() => pressKeypadKey(number)}
+                      onKeyDown={(event) => {
+                        if (
+                          letters &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault();
+                          pressKeypadKey(number);
+                        }
+                      }}
+                    >
+                      <strong>{number}</strong>
+                      <span>{letters}</span>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  className="button game-add"
+                  type="submit"
                   disabled={!mounted || gameOver}
-                  aria-label="Word built from today's digits"
-                />
-                <button className="button" type="submit" disabled={!mounted || gameOver}>
-                  Add
+                >
+                  Add word
                 </button>
               </form>
               {feedback && (

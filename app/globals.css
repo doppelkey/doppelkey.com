@@ -518,7 +518,7 @@ h1 {
   grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
   grid-template-areas:
     "status keypad"
-    "found entry";
+    "found keypad";
   gap: 1.4vw;
   align-items: start;
 }
@@ -537,9 +537,6 @@ h1 {
 }
 .panel-keypad {
   grid-area: keypad;
-}
-.panel-entry {
-  grid-area: entry;
 }
 .panel-found {
   grid-area: found;
@@ -588,64 +585,47 @@ h1 {
 .panel-keypad .key-summary {
   font-size: clamp(12px, 1vw, 15px);
 }
-.word-form {
-  display: flex;
-  gap: 0.6vw;
+.keypad-form {
+  margin: 0;
 }
-.word-input {
-  flex: 1;
-  min-width: 0;
-  border: 1px solid var(--line);
+.typing-shell {
+  position: relative;
+  margin: 0 0 1.4vw;
   border-radius: 7px;
-  background: var(--paper);
-  color: var(--ink);
+}
+.panel-keypad .typing-word {
+  min-height: 1em;
   font-family: var(--font-paytone-one), sans-serif;
-  font-size: clamp(14px, 1.15vw, 16px);
-  letter-spacing: 0.08em;
+  font-size: clamp(26px, 4.2vw, 56px);
+  line-height: 1;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  padding: 0.55em 0.8em;
 }
-.word-input:focus {
-  outline: 2px solid var(--orange);
-  outline-offset: 1px;
-}
-.word-input::placeholder {
+.typing-placeholder {
   color: #9a9da5;
-  text-transform: none;
-  letter-spacing: 0;
   font-family: var(--font-noto-sans), sans-serif;
-  font-size: clamp(11px, 0.8vw, 13px);
+  font-size: clamp(12px, 0.9vw, 14px);
+  letter-spacing: 0;
+  text-transform: none;
 }
-.letter-bank {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4vw;
-  margin-top: 1.1vw;
+.typing-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 16px;
 }
-.letter-chip {
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  background: var(--cream);
-  color: var(--ink);
-  font-family: var(--font-paytone-one), sans-serif;
-  font-size: clamp(12px, 0.95vw, 14px);
-  width: clamp(28px, 2.1vw, 34px);
-  height: clamp(28px, 2.1vw, 34px);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
+.typing-input:focus {
+  outline: none;
 }
-.letter-chip:hover {
-  background: var(--orange);
-  border-color: var(--orange);
-}
-.letter-chip:disabled {
-  cursor: default;
-  opacity: 0.5;
-}
-.letter-chip:disabled:hover {
-  background: var(--cream);
-  border-color: var(--line);
+.game-add {
+  width: 100%;
+  margin-top: 1.2vw;
 }
 .game-feedback {
   display: inline-block;
@@ -707,7 +687,6 @@ h1 {
     grid-template-areas:
       "status"
       "keypad"
-      "entry"
       "found";
     gap: 14px;
   }
@@ -739,26 +718,18 @@ h1 {
   .panel-keypad .key-summary {
     font-size: 2.6vw;
   }
-  .word-form {
-    gap: 8px;
+  .typing-shell {
+    margin-bottom: 4vw;
   }
-  .word-form .button {
-    font-size: 3.4vw;
+  .panel-keypad .typing-word {
+    font-size: clamp(26px, 11vw, 40px);
   }
-  .word-input {
-    font-size: 4.5vw;
-  }
-  .word-input::placeholder {
+  .typing-placeholder {
     font-size: 3.2vw;
   }
-  .letter-bank {
-    gap: 6px;
+  .game-add {
     margin-top: 12px;
-  }
-  .letter-chip {
-    width: 8.5vw;
-    height: 8.5vw;
-    font-size: 3.6vw;
+    font-size: 3.4vw;
   }
   .game-feedback {
     font-size: 3.2vw;
