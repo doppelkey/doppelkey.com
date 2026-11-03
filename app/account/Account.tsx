@@ -5,6 +5,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import AuthButton from "../AuthButton";
 import { getSupabase, signInWithGoogle, type MyStats } from "@/lib/supabase";
 import { useAuth } from "@/lib/useAuth";
+import { NAME_RULES, saveUsername } from "@/lib/profile";
 
 export default function Account() {
   const { ready, session } = useAuth();
@@ -13,6 +14,9 @@ export default function Account() {
   const [stats, setStats] = useState<MyStats | null>(null);
   const [nameDraft, setNameDraft] = useState("");
   const [message, setMessage] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
 
   // The profile picture is the one Google sent at sign-in, kept in the user's
@@ -36,18 +40,30 @@ export default function Account() {
     else setStats(null);
   }, [userId, loadStats]);
 
-  const saveName = (event: FormEvent) => {
+  const cancelEdit = () => {
+    setNameDraft(stats?.display_name ?? "");
+    setEditing(false);
+    setMessage("");
+  };
+
+  const saveName = async (event: FormEvent) => {
     event.preventDefault();
-    getSupabase()
-      .rpc("set_display_name", { p_name: nameDraft })
-      .then(({ error }) => {
-        if (error) {
-          setMessage("Use 2 to 24 letters, numbers, spaces or . _ - '");
-          return;
-        }
-        setMessage("Saved.");
-        loadStats();
-      });
+    if (!userId || saving) return;
+    setSaving(true);
+    setMessage("");
+    setSaveError(false);
+    try {
+      const name = await saveUsername(nameDraft, userId);
+      setStats((current) => current ? { ...current, display_name: name } : current);
+      setNameDraft(name);
+      setEditing(false);
+      setMessage("Username saved.");
+    } catch (error) {
+      setSaveError(true);
+      setMessage(error instanceof Error ? error.message : "Couldn't save your username. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const initial = (stats?.display_name ?? user?.email ?? "?").trim().charAt(0).toUpperCase();
@@ -95,8 +111,42 @@ export default function Account() {
                     {initial}
                   </div>
                 )}
-                <div>
-                  <p className="account-name">{stats?.display_name ?? "Loading"}</p>
+                <div className="account-details">
+                  {editing ? (
+                    <form className="account-edit-form" onSubmit={saveName} onKeyDown={(event) => {
+                      if (event.key === "Escape" && !saving) cancelEdit();
+                    }}>
+                      <label htmlFor="account-name">Username</label>
+                      <input id="account-name" value={nameDraft} maxLength={24} autoFocus
+                        autoComplete="nickname" disabled={saving} aria-describedby="username-rules username-message"
+                        aria-invalid={saveError} onChange={(event) => {
+                          setNameDraft(event.target.value);
+                          setSaveError(false);
+                          setMessage("");
+                        }} />
+                      <div className="account-edit-actions">
+                        <button className="button button-small" type="submit" disabled={saving}>
+                          {saving ? "Saving..." : "Save"}
+                        </button>
+                        <button className="button button-small button-outline" type="button" disabled={saving} onClick={cancelEdit}>Cancel</button>
+                      </div>
+                      <p className="account-help" id="username-rules">{NAME_RULES} Usernames are unique, ignoring capitalization.</p>
+                    </form>
+                  ) : (
+                    <div className="account-name-row">
+                      <p className="account-name">{stats?.display_name ?? "Loading"}</p>
+                      {stats && <button className="account-edit-button" type="button" aria-label="Edit username" onClick={() => {
+                        setNameDraft(stats.display_name ?? "");
+                        setMessage("");
+                        setSaveError(false);
+                        setEditing(true);
+                      }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element -- local SVG icon */}
+                        <img src="/edit.svg" width="24" height="24" alt="" />
+                      </button>}
+                    </div>
+                  )}
+                  <p id="username-message" className={saveError ? "account-message account-error" : "account-message"} role={saveError ? "alert" : "status"}>{message}</p>
                   {user?.email && <p className="account-email">{user.email}</p>}
                 </div>
               </div>
@@ -118,23 +168,7 @@ export default function Account() {
                 </div>
               )}
 
-              <form className="leaderboard-name-form" onSubmit={saveName}>
-                <label htmlFor="account-name">Username</label>
-                <input
-                  id="account-name"
-                  value={nameDraft}
-                  maxLength={24}
-                  onChange={(event) => setNameDraft(event.target.value)}
-                />
-                <button className="button button-small" type="submit">
-                  Save
-                </button>
-                {message && <span>{message}</span>}
-              </form>
-              <p className="leaderboard-sub">
-                Only your username, rank, score and word count are shown on the public leaderboard. Your
-                picture and email stay private.
-              </p>
+
             </>
           )}
         </div>

@@ -1327,3 +1327,31 @@ h1 {
     padding: 10px 10px;
   }
 }
+
+.account-details { min-width: 0; flex: 1; }
+.account-name-row { display: flex; align-items: center; gap: 10px; }
+.account-edit-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; flex: none;
+  background: transparent; border: 1px solid transparent; border-radius: 8px; cursor: pointer;
+}
+.account-edit-button:hover { background: rgba(255, 170, 0, 0.18); }
+.account-edit-button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.account-edit-form { display: grid; gap: 10px; max-width: 490px; }
+.account-edit-form input {
+  width: 100%; min-width: 0; box-sizing: border-box; padding: 10px 12px;
+  border: 1px solid var(--ink); border-radius: 7px; font: inherit; background: #fff;
+}
+.account-edit-form input[aria-invalid="true"] { border-color: #a32216; }
+.account-edit-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.account-help { font-size: 13px; line-height: 1.5; color: #4f535b; margin: 0; }
+.account-message { font-size: 14px; line-height: 1.5; margin: 4px 0 0; }
+.account-message:empty { display: none; }
+.account-error { color: #a32216; }
+.account-email { overflow-wrap: anywhere; }
+@media (max-width: 540px) {
+  .account-card { gap: 14px; align-items: flex-start; }
+  .account-avatar { width: 72px; height: 72px; }
+  .account-name { font-size: 20px; }
+  .account-details { flex-basis: calc(100% - 90px); }
+}
