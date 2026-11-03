@@ -154,7 +154,6 @@ export default function Home() {
         <Header />
         <div className="content-wrap hero-content">
           <div className="hero-copy">
-            <p className="eyebrow">A DAILY DIGIT WORD PUZZLE</p>
             <h1>
               Build words
               <br />

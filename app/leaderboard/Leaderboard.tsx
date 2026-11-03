@@ -106,7 +106,6 @@ export default function Leaderboard() {
           </nav>
         </header>
         <div className="content-wrap leaderboard-section">
-          <p className="eyebrow">DAILY LEADERBOARD</p>
           <h1 className="leaderboard-title">{day ? dayLabel(day) : "Loading"}</h1>
           <p className="leaderboard-sub">
             Ranked scores only, one attempt per player. The board resets at midnight IST.
