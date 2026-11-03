@@ -168,6 +168,12 @@ export default function Leaderboard() {
             </div>
           )}
 
+          {stats && (
+            <p className="leaderboard-sub">
+              <Link href="/account">Your account</Link>
+            </p>
+          )}
+
           {error && <p className="leaderboard-empty">Couldn&apos;t load the leaderboard. Try again in a moment.</p>}
           {!error && rows && rows.length === 0 && (
             <p className="leaderboard-empty">No ranked scores for this day yet.</p>
