@@ -51,11 +51,17 @@ export default function Game() {
   const [digits, setDigits] = useState<string[]>([]);
   const [dateLabel, setDateLabel] = useState("");
   const [dictionary, setDictionary] = useState<Set<string> | null>(null);
+  const [wordlistState, setWordlistState] = useState<"loading" | "ready" | "error">("loading");
   const [input, setInput] = useState("");
   const [found, setFound] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<{ tone: "info" | "good" | "bad"; text: string } | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(ROUND_SECONDS);
   const [keypadSelection, setKeypadSelection] = useState<{ digit: string; index: number } | null>(null);
+  const [definition, setDefinition] = useState<{
+    word: string;
+    status: "loading" | "ready" | "missing" | "error";
+    text: string;
+  } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const typingRef = useRef<HTMLDivElement>(null);
   const keypadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -79,29 +85,41 @@ export default function Game() {
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/words.txt")
-      .then((res) => res.text())
-      .then((text) => {
-        if (cancelled) return;
-        setDictionary(new Set(text.split("\n").filter(Boolean)));
+  const fetchWordlist = () =>
+    fetch("/wordlist.txt")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
       })
-      .catch(() => {
-        if (!cancelled) setDictionary(new Set());
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+      .then((text) => {
+        const words = text
+          .split("\n")
+          .map((word) => word.trim())
+          .filter((word) => /^[a-z]{4,}$/.test(word));
+        if (words.length < 1000) throw new Error("Wordlist failed validation");
+        setDictionary(new Set(words));
+        setWordlistState("ready");
+      })
+      .catch(() => setWordlistState("error"));
 
   useEffect(() => {
-    if (!mounted) return;
+    fetchWordlist();
+  }, []);
+
+  const retryWordlist = () => {
+    setWordlistState("loading");
+    fetchWordlist();
+  };
+
+  const ready = mounted && wordlistState === "ready";
+
+  useEffect(() => {
+    if (!ready) return;
     const timer = setInterval(() => {
       setSecondsLeft((value) => (value > 0 ? value - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
-  }, [mounted]);
+  }, [ready]);
 
   const allowedLetters = useMemo(() => {
     const letters = new Set<string>();
@@ -121,7 +139,7 @@ export default function Game() {
     return matches;
   }, [dictionary, allowedLetters]);
 
-  const gameOver = mounted && secondsLeft <= 0;
+  const gameOver = ready && secondsLeft <= 0;
   const missedWords = gameOver
     ? possibleWords.filter((word) => !found.includes(word))
     : [];
@@ -144,11 +162,11 @@ export default function Game() {
       return;
     }
     if (!dictionary) {
-      setFeedback({ tone: "info", text: "Word list is still loading, try again." });
+      setFeedback({ tone: "info", text: "Wordlist is still loading, try again." });
       return;
     }
     if (!dictionary.has(word)) {
-      setFeedback({ tone: "bad", text: "Not in the offline word list." });
+      setFeedback({ tone: "bad", text: "Not in today's wordlist." });
       return;
     }
     setFound((words) => [...words, word].sort());
@@ -162,7 +180,7 @@ export default function Game() {
   }, []);
 
   const pressKeypadKey = (digit: string) => {
-    if (gameOver) return;
+    if (!ready || gameOver) return;
     const letters = KEY_LETTERS[digit];
     if (!letters) return;
 
@@ -186,6 +204,45 @@ export default function Game() {
   const handleInputChange = (value: string) => {
     setInput(value.replace(/[^a-zA-Z]/g, ""));
     setKeypadSelection(null);
+  };
+
+  // Definitions come from the Datamuse API (https://datamuse.com/api/). Free
+  // without a key until 2027-02-01, after which an API key is required
+  // (100,000 requests/day per key).
+  const fetchDefinition = (word: string) => {
+    setDefinition({ word, status: "loading", text: "" });
+    fetch(
+      `https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&max=5&md=d`
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((entries: { word?: string; defs?: string[] }[]) => {
+        const match = entries?.find(
+          (entry) => entry.word?.toLowerCase() === word
+        );
+        const defs = match?.defs;
+        if (!defs || defs.length === 0) {
+          setDefinition({ word, status: "missing", text: "No definition found." });
+          return;
+        }
+        const text = defs
+          .slice(0, 2)
+          .map((def) => {
+            const [pos, ...rest] = def.split("\t");
+            return `(${pos}) ${rest.join(" ").trim()}`;
+          })
+          .join(" ");
+        setDefinition({ word, status: "ready", text });
+      })
+      .catch(() =>
+        setDefinition({
+          word,
+          status: "error",
+          text: "Couldn't load the definition. Tap the word to retry.",
+        })
+      );
   };
 
   const progressPct = possibleWords.length
@@ -245,7 +302,7 @@ export default function Game() {
                 <div className="typing-shell">
                   <div className="typing-word" ref={typingRef} aria-hidden="true">
                     {gameOver ? (
-                      <span className="typing-placeholder">Time's up!</span>
+                      <span className="typing-placeholder">Time&rsquo;s up!</span>
                     ) : input ? (
                       input.toUpperCase()
                     ) : null}
@@ -259,7 +316,7 @@ export default function Game() {
                     onChange={(event) => handleInputChange(event.target.value)}
                     autoComplete="off"
                     autoCapitalize="characters"
-                    disabled={!mounted || gameOver}
+                    disabled={!ready || gameOver}
                     aria-label="Word built from today's digits"
                   />
                 </div>
@@ -289,7 +346,7 @@ export default function Game() {
                 <button
                   className="button game-add"
                   type="submit"
-                  disabled={!mounted || gameOver}
+                  disabled={!ready || gameOver}
                 >
                   Add word
                 </button>
@@ -303,31 +360,75 @@ export default function Game() {
             <div className="game-panel panel-found">
               <p className="panel-label">Found words</p>
               <div className="found-words">
-                {found.map((word) => (
-                  <span className="status status-teal" key={word}>
-                    {word.toUpperCase()}
-                  </span>
-                ))}
-                {gameOver &&
-                  missedWords.map((word) => (
-                    <span className="status status-missing" key={word}>
+                {found.map((word) =>
+                  gameOver ? (
+                    <button
+                      className="status status-teal"
+                      key={word}
+                      type="button"
+                      onClick={() => fetchDefinition(word)}
+                    >
+                      {word.toUpperCase()}
+                    </button>
+                  ) : (
+                    <span className="status status-teal" key={word}>
                       {word.toUpperCase()}
                     </span>
+                  )
+                )}
+                {gameOver &&
+                  missedWords.map((word) => (
+                    <button
+                      className="status status-missing"
+                      key={word}
+                      type="button"
+                      onClick={() => fetchDefinition(word)}
+                    >
+                      {word.toUpperCase()}
+                    </button>
                   ))}
               </div>
+              {gameOver && definition && (
+                <p className="word-definition" aria-live="polite">
+                  <strong>{definition.word.toUpperCase()}</strong>{" "}
+                  {definition.status === "loading"
+                    ? "Loading definition..."
+                    : definition.text}
+                </p>
+              )}
               {found.length === 0 && !gameOver && (
                 <p className="found-empty">Words you find will land here.</p>
               )}
               {gameOver && (
                 <p className="found-copy">
                   Time&apos;s up. You found {found.length} of {possibleWords.length}{" "}
-                  words. Solid letters are yours, dashed ones got away.
+                  words. Solid letters are yours, dashed ones got away. Tap any
+                  word for its definition.
                 </p>
               )}
             </div>
           </div>
         </div>
       </section>
+      {wordlistState !== "ready" && (
+        <div className="game-loading-overlay" role="status" aria-live="polite">
+          <div className="game-loading-card">
+            {wordlistState === "error" ? (
+              <>
+                <p className="game-loading-text">Couldn&apos;t load the wordlist</p>
+                <button className="button" type="button" onClick={retryWordlist}>
+                  Try again
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="game-spinner" aria-hidden="true" />
+                <p className="game-loading-text">Loading wordlist</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
