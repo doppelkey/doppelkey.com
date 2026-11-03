@@ -81,11 +81,17 @@ h3,
   font-size: 0.85vw;
   white-space: nowrap;
   cursor: pointer;
-  transition: transform 70ms ease-out, filter 120ms ease;
+  box-shadow: 0 3px 0 rgba(29, 34, 44, 0.16);
+  transition: transform 70ms ease-out, box-shadow 70ms ease-out,
+    filter 120ms ease;
+}
+.button:not(:disabled):hover {
+  filter: brightness(1.04);
 }
 .button:not(:disabled):active {
-  transform: translateY(1px) scale(0.97);
-  filter: brightness(0.92);
+  transform: translateY(2px) scale(0.96);
+  box-shadow: 0 1px 0 rgba(29, 34, 44, 0.16);
+  filter: brightness(0.95);
 }
 .button-small {
   padding: 0.65em 1.25em;
