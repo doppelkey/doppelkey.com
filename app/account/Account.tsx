@@ -112,11 +112,30 @@ export default function Account() {
                   </div>
                 )}
                 <div className="account-details">
-                  {editing ? (
+                  <div className="account-name-row">
+                    <p className="account-name">{stats?.display_name ?? "Loading"}</p>
+                    {stats && !editing && <button className="account-edit-button" type="button" aria-label="Edit username" aria-expanded={editing} onClick={() => {
+                      setNameDraft(stats.display_name ?? "");
+                      setMessage("");
+                      setSaveError(false);
+                      setEditing(true);
+                    }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element -- local SVG icon */}
+                      <img src="/edit.svg" width="24" height="24" alt="" />
+                    </button>}
+                  </div>
+
+                  {user?.email && <p className="account-email">{user.email}</p>}
+                </div>
+              </div>
+
+              {editing && (
+                <div className="account-editor">
                     <form className="account-edit-form" onSubmit={saveName} onKeyDown={(event) => {
                       if (event.key === "Escape" && !saving) cancelEdit();
                     }}>
                       <label htmlFor="account-name">Username</label>
+                      <div className="account-edit-controls">
                       <input id="account-name" value={nameDraft} maxLength={24} autoFocus
                         autoComplete="nickname" disabled={saving} aria-describedby="username-rules username-message"
                         aria-invalid={saveError} onChange={(event) => {
@@ -130,26 +149,12 @@ export default function Account() {
                         </button>
                         <button className="button button-small button-outline" type="button" disabled={saving} onClick={cancelEdit}>Cancel</button>
                       </div>
+                      </div>
                       <p className="account-help" id="username-rules">{NAME_RULES} Usernames are unique, ignoring capitalization.</p>
                     </form>
-                  ) : (
-                    <div className="account-name-row">
-                      <p className="account-name">{stats?.display_name ?? "Loading"}</p>
-                      {stats && <button className="account-edit-button" type="button" aria-label="Edit username" onClick={() => {
-                        setNameDraft(stats.display_name ?? "");
-                        setMessage("");
-                        setSaveError(false);
-                        setEditing(true);
-                      }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element -- local SVG icon */}
-                        <img src="/edit.svg" width="24" height="24" alt="" />
-                      </button>}
-                    </div>
-                  )}
-                  <p id="username-message" className={saveError ? "account-message account-error" : "account-message"} role={saveError ? "alert" : "status"}>{message}</p>
-                  {user?.email && <p className="account-email">{user.email}</p>}
                 </div>
-              </div>
+              )}
+              <p id="username-message" className={saveError ? "account-message account-error" : "account-message"} role={saveError ? "alert" : "status"}>{message}</p>
 
               {stats && (
                 <div className="leaderboard-stats">
