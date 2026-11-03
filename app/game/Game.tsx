@@ -17,6 +17,9 @@ const KEYS: [string, string][] = [
 const KEY_LETTERS: Record<string, string> = Object.fromEntries(KEYS);
 const ROUND_SECONDS = 180;
 
+// 4-letter word = 1 point, +1 point for each extra letter.
+const wordPoints = (word: string) => Math.max(0, word.length - 3);
+
 function mulberry32(seed: number) {
   return function () {
     seed |= 0;
@@ -245,9 +248,7 @@ export default function Game() {
       );
   };
 
-  const progressPct = possibleWords.length
-    ? Math.round((found.length / possibleWords.length) * 100)
-    : 0;
+  const score = found.reduce((total, word) => total + wordPoints(word), 0);
 
   return (
     <div className="page-shell" id="top">
@@ -277,18 +278,13 @@ export default function Game() {
             <div className="game-panel panel-status">
               <p className="panel-label">Time left</p>
               <p className="game-timer">{formatTime(secondsLeft)}</p>
-              <div className="progress-track" aria-hidden="true">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
               <p className="game-progress">
-                {found.length} of {possibleWords.length || "…"} words found
+                Score: {score} {score === 1 ? "point" : "points"}
               </p>
               <p className="game-rules">
-                Words need four or more letters. Reuse any letter as often as
-                you like.
+                Words need four or more letters. A four-letter word is worth 1
+                point, and each extra letter adds 1 more. Reuse any letter as
+                often as you like.
               </p>
             </div>
             <div className="game-panel panel-keypad">
@@ -401,8 +397,8 @@ export default function Game() {
               )}
               {gameOver && (
                 <p className="found-copy">
-                  Time&apos;s up. You found {found.length} of {possibleWords.length}{" "}
-                  words. Solid letters are yours, dashed ones got away. Tap any
+                  Time&apos;s up. You scored {score} {score === 1 ? "point" : "points"} with{" "}
+                  {found.length} {found.length === 1 ? "word" : "words"}. Solid letters are yours, dashed ones got away. Tap any
                   word for its definition.
                 </p>
               )}
