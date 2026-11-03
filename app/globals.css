@@ -488,11 +488,15 @@ h1 {
   min-height: 100vh;
   padding-bottom: 4vw;
 }
+.game-section .site-header,
+.game-section .content-wrap {
+  max-width: 840px;
+}
 .game-hero {
   padding: 2.8vw 0 2.2vw;
 }
 .game-digits {
-  font-size: 4.6vw;
+  font-size: clamp(42px, 4.6vw, 56px);
   margin: 0;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -500,7 +504,7 @@ h1 {
 .game-date {
   margin: 1vw 0 0;
   color: var(--muted);
-  font-size: 0.9vw;
+  font-size: clamp(12px, 0.9vw, 14px);
 }
 .game-board {
   display: grid;
@@ -535,7 +539,7 @@ h1 {
 }
 .panel-label {
   margin: 0 0 1.1vw;
-  font-size: 0.65vw;
+  font-size: clamp(10px, 0.65vw, 12px);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #62656c;
@@ -543,7 +547,7 @@ h1 {
 .game-timer {
   margin: 0;
   font-family: var(--font-paytone-one), sans-serif;
-  font-size: 3vw;
+  font-size: clamp(32px, 3vw, 40px);
   line-height: 1;
 }
 .progress-track {
@@ -562,20 +566,20 @@ h1 {
 }
 .game-progress {
   margin: 0.8vw 0 0;
-  font-size: 0.85vw;
+  font-size: clamp(12px, 0.85vw, 14px);
   color: #52565f;
 }
 .game-rules {
   margin: 1.6vw 0 0;
   color: var(--muted);
   line-height: 1.45;
-  font-size: 0.8vw;
+  font-size: clamp(11px, 0.8vw, 13px);
 }
 .panel-keypad .puzzle-header {
   margin-bottom: 1.6vw;
 }
 .panel-keypad .key-summary {
-  font-size: 1vw;
+  font-size: clamp(12px, 1vw, 15px);
 }
 .word-form {
   display: flex;
@@ -589,7 +593,7 @@ h1 {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-paytone-one), sans-serif;
-  font-size: 1.15vw;
+  font-size: clamp(14px, 1.15vw, 16px);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0.55em 0.8em;
@@ -603,7 +607,7 @@ h1 {
   text-transform: none;
   letter-spacing: 0;
   font-family: var(--font-noto-sans), sans-serif;
-  font-size: 0.8vw;
+  font-size: clamp(11px, 0.8vw, 13px);
 }
 .letter-bank {
   display: flex;
@@ -617,9 +621,9 @@ h1 {
   background: var(--cream);
   color: var(--ink);
   font-family: var(--font-paytone-one), sans-serif;
-  font-size: 0.95vw;
-  width: 2.1vw;
-  height: 2.1vw;
+  font-size: clamp(12px, 0.95vw, 14px);
+  width: clamp(28px, 2.1vw, 34px);
+  height: clamp(28px, 2.1vw, 34px);
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -641,7 +645,7 @@ h1 {
   margin: 1vw 0 0;
   padding: 0.5em 0.9em;
   border-radius: 5px;
-  font-size: 0.72vw;
+  font-size: clamp(11px, 0.72vw, 12px);
   font-weight: 700;
 }
 .game-feedback-good {
@@ -665,16 +669,16 @@ h1 {
   overflow-y: auto;
 }
 .found-words .status {
-  font-size: 0.7vw;
+  font-size: clamp(11px, 0.7vw, 12px);
 }
 .found-empty {
   margin: 0;
   color: #9a9da5;
-  font-size: 0.8vw;
+  font-size: clamp(11px, 0.8vw, 13px);
 }
 .panel-found .found-copy {
   margin: 0.9vw 0 0;
-  font-size: 0.72vw;
+  font-size: clamp(11px, 0.72vw, 12px);
 }
 
 @media (max-width: 600px) {
