@@ -662,6 +662,16 @@ h1 {
   flex: 1 1 auto;
   min-width: 0;
 }
+.game-add:not(:disabled):hover,
+.game-backspace:not(:disabled):hover {
+  filter: brightness(1.04);
+}
+.game-add:not(:disabled):active,
+.game-backspace:not(:disabled):active {
+  transform: translateY(2px) scale(0.96);
+  box-shadow: 0 1px 0 rgba(29, 34, 44, 0.16);
+  filter: brightness(0.95);
+}
 .game-backspace {
   width: 4.5em;
   padding: 0.65em;
