@@ -1242,10 +1242,20 @@ h1 {
   font-weight: 700;
 }
 .leaderboard-stats {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  overflow: hidden;
   margin: 0 0 20px;
+}
+.leaderboard-stats p {
+  margin: 0;
+  padding: 16px 10px;
+  background: var(--paper);
+  text-align: center;
 }
 .leaderboard-stats strong {
   display: block;
