@@ -189,6 +189,13 @@ h1 {
 .key-active {
   background: var(--orange);
 }
+.key-interactive {
+  cursor: pointer;
+}
+.key-interactive:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
 .puzzle-footer {
   display: flex;
   align-items: center;
@@ -479,5 +486,281 @@ h1 {
   .footer-content nav {
     gap: 12px;
     flex-wrap: wrap;
+  }
+}
+
+/* Game page */
+.game-section {
+  background: var(--cream);
+  min-height: 100vh;
+  padding-bottom: 4vw;
+}
+.game-section .site-header,
+.game-section .content-wrap {
+  max-width: 840px;
+}
+.game-hero {
+  padding: 2.8vw 0 2.2vw;
+}
+.game-digits {
+  font-size: clamp(42px, 4.6vw, 56px);
+  margin: 0;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.game-date {
+  margin: 1vw 0 0;
+  color: var(--muted);
+  font-size: clamp(12px, 0.9vw, 14px);
+}
+.game-board {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  grid-template-areas:
+    "status keypad"
+    "found keypad";
+  gap: 1.4vw;
+  align-items: start;
+}
+.game-panel {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 1.9vw 2vw;
+  min-width: 0;
+}
+.panel-keypad .keypad {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.panel-status {
+  grid-area: status;
+}
+.panel-keypad {
+  grid-area: keypad;
+}
+.panel-found {
+  grid-area: found;
+}
+.panel-label {
+  margin: 0 0 1.1vw;
+  font-size: clamp(10px, 0.65vw, 12px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #62656c;
+}
+.game-timer {
+  margin: 0;
+  font-family: var(--font-paytone-one), sans-serif;
+  font-size: clamp(32px, 3vw, 40px);
+  line-height: 1;
+}
+.progress-track {
+  margin-top: 1.2vw;
+  height: 0.55vw;
+  min-height: 6px;
+  border-radius: 999px;
+  background: #e4ded2;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--orange);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.game-progress {
+  margin: 0.8vw 0 0;
+  font-size: clamp(12px, 0.85vw, 14px);
+  color: #52565f;
+}
+.game-rules {
+  margin: 1.6vw 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+  font-size: clamp(11px, 0.8vw, 13px);
+}
+.panel-keypad .puzzle-header {
+  margin-bottom: 1.6vw;
+}
+.panel-keypad .key-summary {
+  font-size: clamp(12px, 1vw, 15px);
+}
+.keypad-form {
+  margin: 0;
+}
+.typing-shell {
+  position: relative;
+  margin: 0 0 1.4vw;
+  border-radius: 7px;
+}
+.panel-keypad .typing-word {
+  min-height: 1em;
+  font-family: var(--font-paytone-one), sans-serif;
+  font-size: 4.2vw;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.panel-keypad .typing-word::-webkit-scrollbar {
+  display: none;
+}
+.typing-placeholder {
+  color: #9a9da5;
+  font-family: var(--font-paytone-one), sans-serif;
+  letter-spacing: 0;
+}
+.typing-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 16px;
+}
+.typing-input:focus {
+  outline: none;
+}
+.game-add {
+  width: 100%;
+  margin-top: 1.2vw;
+}
+.game-feedback {
+  display: inline-block;
+  margin: 1vw 0 0;
+  padding: 0.5em 0.9em;
+  border-radius: 5px;
+  font-size: clamp(11px, 0.72vw, 12px);
+  font-weight: 700;
+}
+.game-feedback-good {
+  background: var(--teal);
+  color: var(--paper);
+}
+.game-feedback-bad {
+  background: #fbe3cf;
+  color: #c25e10;
+}
+.game-feedback-info {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.found-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35vw;
+  max-height: 10.5vw;
+  overflow-y: auto;
+}
+.found-words .status {
+  font-size: clamp(11px, 0.7vw, 12px);
+}
+.found-empty {
+  margin: 0;
+  color: #9a9da5;
+  font-size: clamp(11px, 0.8vw, 13px);
+}
+.panel-found .found-copy {
+  margin: 0.9vw 0 0;
+  font-size: clamp(11px, 0.72vw, 12px);
+}
+
+@media (max-width: 600px) {
+  .game-section {
+    min-height: auto;
+    padding-bottom: 56px;
+  }
+  .game-hero {
+    padding: 40px 0 28px;
+  }
+  .game-digits {
+    font-size: clamp(40px, 13vw, 64px);
+  }
+  .game-date {
+    font-size: 3.4vw;
+  }
+  .game-board {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "status"
+      "keypad"
+      "found";
+    gap: 14px;
+  }
+  .game-panel {
+    padding: 5vw;
+  }
+  .panel-label {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+  .game-timer {
+    font-size: 9vw;
+  }
+  .progress-track {
+    margin-top: 14px;
+    height: 8px;
+  }
+  .game-progress {
+    font-size: 3.4vw;
+    margin-top: 10px;
+  }
+  .game-rules {
+    font-size: 3.4vw;
+    margin-top: 18px;
+  }
+  .panel-keypad .puzzle-header {
+    margin-bottom: 4vw;
+  }
+  .panel-keypad .key-summary {
+    font-size: 2.6vw;
+  }
+  .typing-shell {
+    margin-bottom: 4vw;
+  }
+  .panel-keypad .typing-word {
+    font-size: 11vw;
+  }
+  .typing-placeholder {
+    font-family: var(--font-paytone-one), sans-serif;
+  }
+  .game-add {
+    margin-top: 12px;
+    font-size: 3.4vw;
+  }
+  .game-feedback {
+    font-size: 3.2vw;
+  }
+  .found-words {
+    gap: 6px;
+    max-height: 40vh;
+  }
+  .found-words .status {
+    font-size: 3.2vw;
+  }
+  .found-empty {
+    font-size: 3.4vw;
+  }
+}
+
+/* Game page mobile readability minimums (scoped so the landing page is untouched) */
+@media (max-width: 600px) {
+  .game-section .brand {
+    font-size: 18px;
+  }
+  .game-section .main-nav .button {
+    font-size: 13px;
+    padding: 10px 14px;
+    min-height: 40px;
+  }
+  .game-section .eyebrow {
+    font-size: 12px;
   }
 }
