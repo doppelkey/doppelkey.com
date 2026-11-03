@@ -218,7 +218,7 @@ export default function Home() {
             <a href="#how-it-works">How to play</a>
             <a href="#archive">Examples</a>
             <a href="#about">About</a>
-            <a href="#privacy">Privacy</a>
+            <a href="/privacy">Privacy</a>
             <a href="#contact">Contact</a>
           </nav>
         </div>
