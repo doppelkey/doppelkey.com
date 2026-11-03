@@ -60,12 +60,14 @@ export default function Game() {
   const [feedback, setFeedback] = useState<{ tone: "info" | "good" | "bad"; text: string } | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(ROUND_SECONDS);
   const [keypadSelection, setKeypadSelection] = useState<{ digit: string; index: number } | null>(null);
+  const [overlayDismissed, setOverlayDismissed] = useState(false);
   const [definition, setDefinition] = useState<{
     word: string;
     status: "loading" | "ready" | "missing" | "error";
     text: string;
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const overlayButtonRef = useRef<HTMLButtonElement>(null);
   const typingRef = useRef<HTMLDivElement>(null);
   const keypadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -143,9 +145,14 @@ export default function Game() {
   }, [dictionary, allowedLetters]);
 
   const gameOver = ready && secondsLeft <= 0;
+  const showGameOverOverlay = gameOver && !overlayDismissed;
   const missedWords = gameOver
     ? possibleWords.filter((word) => !found.includes(word))
     : [];
+
+  useEffect(() => {
+    if (showGameOverOverlay) overlayButtonRef.current?.focus();
+  }, [showGameOverOverlay]);
 
   const submitWord = (event: FormEvent) => {
     event.preventDefault();
@@ -422,6 +429,38 @@ export default function Game() {
                 <p className="game-loading-text">Loading wordlist</p>
               </>
             )}
+          </div>
+        </div>
+      )}
+      {showGameOverOverlay && (
+        <div
+          className="game-loading-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="game-over-title"
+        >
+          <div className="game-loading-card game-over-card">
+            <p className="game-over-title" id="game-over-title">
+              Time&apos;s up!
+            </p>
+            <p className="game-over-score">
+              {score}
+              <span className="game-over-score-label">
+                {score === 1 ? "point" : "points"}
+              </span>
+            </p>
+            <p className="game-over-copy">
+              You found {found.length}{" "}
+              {found.length === 1 ? "word" : "words"}.
+            </p>
+            <button
+              className="button"
+              type="button"
+              ref={overlayButtonRef}
+              onClick={() => setOverlayDismissed(true)}
+            >
+              See the words
+            </button>
           </div>
         </div>
       )}
