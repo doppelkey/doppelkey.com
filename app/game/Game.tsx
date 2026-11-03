@@ -17,6 +17,9 @@ const KEYS: [string, string][] = [
 const KEY_LETTERS: Record<string, string> = Object.fromEntries(KEYS);
 const ROUND_SECONDS = 180;
 
+// 4-letter word = 1 point, +1 point for each extra letter.
+const wordPoints = (word: string) => Math.max(0, word.length - 3);
+
 function mulberry32(seed: number) {
   return function () {
     seed |= 0;
@@ -57,12 +60,14 @@ export default function Game() {
   const [feedback, setFeedback] = useState<{ tone: "info" | "good" | "bad"; text: string } | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(ROUND_SECONDS);
   const [keypadSelection, setKeypadSelection] = useState<{ digit: string; index: number } | null>(null);
+  const [overlayDismissed, setOverlayDismissed] = useState(false);
   const [definition, setDefinition] = useState<{
     word: string;
     status: "loading" | "ready" | "missing" | "error";
     text: string;
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const overlayButtonRef = useRef<HTMLButtonElement>(null);
   const typingRef = useRef<HTMLDivElement>(null);
   const keypadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -140,9 +145,14 @@ export default function Game() {
   }, [dictionary, allowedLetters]);
 
   const gameOver = ready && secondsLeft <= 0;
+  const showGameOverOverlay = gameOver && !overlayDismissed;
   const missedWords = gameOver
     ? possibleWords.filter((word) => !found.includes(word))
     : [];
+
+  useEffect(() => {
+    if (showGameOverOverlay) overlayButtonRef.current?.focus();
+  }, [showGameOverOverlay]);
 
   const submitWord = (event: FormEvent) => {
     event.preventDefault();
@@ -245,9 +255,7 @@ export default function Game() {
       );
   };
 
-  const progressPct = possibleWords.length
-    ? Math.round((found.length / possibleWords.length) * 100)
-    : 0;
+  const score = found.reduce((total, word) => total + wordPoints(word), 0);
 
   return (
     <div className="page-shell" id="top">
@@ -277,18 +285,13 @@ export default function Game() {
             <div className="game-panel panel-status">
               <p className="panel-label">Time left</p>
               <p className="game-timer">{formatTime(secondsLeft)}</p>
-              <div className="progress-track" aria-hidden="true">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
               <p className="game-progress">
-                {found.length} of {possibleWords.length || "…"} words found
+                Score: {score} {score === 1 ? "point" : "points"}
               </p>
               <p className="game-rules">
-                Words need four or more letters. Reuse any letter as often as
-                you like.
+                Words need four or more letters. A four-letter word is worth 1
+                point, and each extra letter adds 1 more. Reuse any letter as
+                often as you like.
               </p>
             </div>
             <div className="game-panel panel-keypad">
@@ -401,8 +404,8 @@ export default function Game() {
               )}
               {gameOver && (
                 <p className="found-copy">
-                  Time&apos;s up. You found {found.length} of {possibleWords.length}{" "}
-                  words. Solid letters are yours, dashed ones got away. Tap any
+                  Time&apos;s up. You scored {score} {score === 1 ? "point" : "points"} with{" "}
+                  {found.length} {found.length === 1 ? "word" : "words"}. Solid letters are yours, dashed ones got away. Tap any
                   word for its definition.
                 </p>
               )}
@@ -426,6 +429,38 @@ export default function Game() {
                 <p className="game-loading-text">Loading wordlist</p>
               </>
             )}
+          </div>
+        </div>
+      )}
+      {showGameOverOverlay && (
+        <div
+          className="game-loading-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="game-over-title"
+        >
+          <div className="game-loading-card game-over-card">
+            <p className="game-over-title" id="game-over-title">
+              Time&apos;s up!
+            </p>
+            <p className="game-over-score">
+              {score}
+              <span className="game-over-score-label">
+                {score === 1 ? "point" : "points"}
+              </span>
+            </p>
+            <p className="game-over-copy">
+              You found {found.length}{" "}
+              {found.length === 1 ? "word" : "words"}.
+            </p>
+            <button
+              className="button"
+              type="button"
+              ref={overlayButtonRef}
+              onClick={() => setOverlayDismissed(true)}
+            >
+              See the words
+            </button>
           </div>
         </div>
       )}

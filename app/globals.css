@@ -722,6 +722,36 @@ h1 {
   border-top-color: var(--orange);
   animation: game-spin 0.8s linear infinite;
 }
+.game-over-card {
+  text-align: center;
+}
+.game-over-title {
+  margin: 0;
+  font-family: var(--font-paytone-one), sans-serif;
+  font-size: clamp(20px, 1.8vw, 26px);
+  color: var(--ink);
+}
+.game-over-score {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-paytone-one), sans-serif;
+  font-size: clamp(56px, 5vw, 72px);
+  line-height: 1;
+  color: var(--orange);
+}
+.game-over-score-label {
+  font-family: var(--font-noto-sans), sans-serif;
+  font-size: clamp(14px, 1vw, 16px);
+  color: var(--muted);
+}
+.game-over-copy {
+  margin: 0;
+  font-size: clamp(13px, 0.85vw, 15px);
+  color: var(--muted);
+}
 @keyframes game-spin {
   to {
     transform: rotate(360deg);
@@ -960,6 +990,16 @@ h1 {
   }
   .game-loading-text {
     font-size: 20px;
+  }
+  .game-over-title {
+    font-size: 24px;
+  }
+  .game-over-score {
+    font-size: 64px;
+  }
+  .game-over-score-label,
+  .game-over-copy {
+    font-size: 15px;
   }
 }
 

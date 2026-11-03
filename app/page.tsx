@@ -123,7 +123,7 @@ function HowItWorks() {
     [
       "3",
       "Build your words",
-      "Make real words with four or more letters. Find as many as you can before time runs out.",
+      "Make real words with four or more letters. A four-letter word scores 1 point, and every extra letter adds 1 more. Score as high as you can before time runs out.",
     ],
   ];
   return (
@@ -161,7 +161,8 @@ export default function Home() {
             <p className="hero-description">
               Four unique digits are your only clues. Use their letters to
               build words of four or more letters, reusing any letter as often
-              as you like.
+              as you like. Longer words score more: 1 point for four letters,
+              plus 1 for each extra letter.
             </p>
             <div className="hero-actions">
               <a className="button" href="/game">
@@ -183,7 +184,7 @@ export default function Home() {
             <p>
               Start with 2, 4, 7, and 9. Their letters can make airy, ways,
               wiry, hair, and more. Repeat letters and digits freely, but every word must
-              be at least four letters long.
+              be at least four letters long. AIRY is worth 1 point, HAIRY 2, and AIRWAYS 4.
             </p>
           </div>
           <div className="word-example">
