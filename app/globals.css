@@ -108,6 +108,10 @@ h3,
   box-shadow: 0 1px 0 rgba(29, 34, 44, 0.16);
   filter: brightness(0.95);
 }
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 .button-small {
   padding: 0.65em 1.25em;
 }

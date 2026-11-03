@@ -154,7 +154,7 @@ export default function Leaderboard() {
 
           {error && <p className="leaderboard-empty">Couldn&apos;t load the leaderboard. Try again in a moment.</p>}
           {!error && rows && rows.length === 0 && (
-            <p className="leaderboard-empty">No ranked scores for this day yet.</p>
+            <p className="leaderboard-empty">No ranked scores for this day.</p>
           )}
           {!error && rows && rows.length > 0 && (
             <table className="leaderboard-table">
