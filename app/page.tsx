@@ -37,7 +37,7 @@ function Header() {
         <a href="#how-it-works">How to play</a>
         <a href="#archive">Examples</a>
         <a href="#about">About</a>
-        <a className="button button-small" href="#puzzle">
+        <a className="button button-small" href="/game">
           Play today
         </a>
       </nav>
@@ -164,7 +164,7 @@ export default function Home() {
               as you like.
             </p>
             <div className="hero-actions">
-              <a className="button" href="#puzzle">
+              <a className="button" href="/game">
                 Try today's digits
               </a>
               <a className="button button-outline" href="#how-it-works">
@@ -200,7 +200,7 @@ export default function Home() {
       <section className="cta-section" id="about">
         <div className="content-wrap cta-content">
           <h2>Ready to find your words?</h2>
-          <a className="button" href="#puzzle">
+          <a className="button" href="/game">
             Play today
           </a>
         </div>
