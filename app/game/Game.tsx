@@ -16,6 +16,9 @@ const KEYS: [string, string][] = [
 ];
 const KEY_LETTERS: Record<string, string> = Object.fromEntries(KEYS);
 const ROUND_SECONDS = 180;
+// Multi-tap window: taps on the same key within this time cycle its letters;
+// after it elapses the letter commits and the next tap starts a new one.
+const MULTI_TAP_MS = 400;
 
 // 4-letter word = 1 point, +1 point for each extra letter.
 const wordPoints = (word: string) => Math.max(0, word.length - 3);
@@ -66,7 +69,6 @@ export default function Game() {
     status: "loading" | "ready" | "missing" | "error";
     text: string;
   } | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const overlayButtonRef = useRef<HTMLButtonElement>(null);
   const typingRef = useRef<HTMLDivElement>(null);
   const keypadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -201,8 +203,7 @@ export default function Game() {
     setInput((value) => (isSameKey ? value.slice(0, -1) : value) + nextLetter);
     setKeypadSelection({ digit, index: nextIndex });
     if (keypadTimerRef.current) clearTimeout(keypadTimerRef.current);
-    keypadTimerRef.current = setTimeout(() => setKeypadSelection(null), 900);
-    inputRef.current?.focus();
+    keypadTimerRef.current = setTimeout(() => setKeypadSelection(null), MULTI_TAP_MS);
   };
 
   useEffect(() => {
@@ -211,8 +212,9 @@ export default function Game() {
     if (el) el.scrollLeft = el.scrollWidth;
   }, [input]);
 
-  const handleInputChange = (value: string) => {
-    setInput(value.replace(/[^a-zA-Z]/g, ""));
+  const backspaceWord = () => {
+    if (!ready || gameOver) return;
+    setInput((value) => value.slice(0, -1));
     setKeypadSelection(null);
   };
 
@@ -303,56 +305,65 @@ export default function Game() {
               </div>
               <form className="keypad-form" onSubmit={submitWord}>
                 <div className="typing-shell">
-                  <div className="typing-word" ref={typingRef} aria-hidden="true">
+                  <div
+                    className="typing-word"
+                    ref={typingRef}
+                    aria-label={input ? `Current word: ${input}` : "No letters entered yet"}
+                  >
                     {gameOver ? (
                       <span className="typing-placeholder">Time&rsquo;s up!</span>
                     ) : input ? (
-                      input.toUpperCase()
+                      [...input].map((letter, index) => (
+                        <span
+                          className={`typing-letter${allowedLetters.has(letter.toLowerCase()) ? "" : " typing-letter-faded"}`}
+                          key={`${index}-${letter}`}
+                          aria-hidden="true"
+                        >
+                          {letter.toUpperCase()}
+                        </span>
+                      ))
                     ) : null}
                     {!gameOver && <span className="typing-caret" aria-hidden="true" />}
                   </div>
-                  <input
-                    ref={inputRef}
-                    className="typing-input"
-                    type="text"
-                    value={input}
-                    onChange={(event) => handleInputChange(event.target.value)}
-                    autoComplete="off"
-                    autoCapitalize="characters"
-                    disabled={!ready || gameOver}
-                    aria-label="Word built from today's digits"
-                  />
                 </div>
                 <div className="keypad">
-                  {KEYS.map(([number, letters]) => (
-                    <div
-                      className={`key ${digits.includes(number) ? "key-active" : ""} ${letters ? "key-interactive" : ""}`}
-                      key={number}
-                      role={letters ? "button" : undefined}
-                      tabIndex={letters ? 0 : undefined}
-                      onClick={() => pressKeypadKey(number)}
-                      onKeyDown={(event) => {
-                        if (
-                          letters &&
-                          (event.key === "Enter" || event.key === " ")
-                        ) {
-                          event.preventDefault();
-                          pressKeypadKey(number);
-                        }
-                      }}
-                    >
-                      <strong>{number}</strong>
-                      <span>{letters}</span>
-                    </div>
-                  ))}
+                  {KEYS.map(([number, letters]) =>
+                    letters ? (
+                      <button
+                        className={`key key-interactive ${digits.includes(number) ? "key-active" : ""}`}
+                        key={number}
+                        type="button"
+                        onClick={() => pressKeypadKey(number)}
+                      >
+                        <strong>{number}</strong>
+                        <span>{letters}</span>
+                      </button>
+                    ) : (
+                      <div className="key" key={number}>
+                        <strong>{number}</strong>
+                        <span>{letters}</span>
+                      </div>
+                    )
+                  )}
                 </div>
-                <button
-                  className="button game-add"
-                  type="submit"
-                  disabled={!ready || gameOver}
-                >
-                  Add word
-                </button>
+                <div className="game-actions">
+                  <button
+                    className="button game-add"
+                    type="submit"
+                    disabled={!ready || gameOver}
+                  >
+                    Add word
+                  </button>
+                  <button
+                    className="button button-outline game-backspace"
+                    type="button"
+                    onClick={backspaceWord}
+                    disabled={!ready || gameOver || input.length === 0}
+                    aria-label="Delete last letter"
+                  >
+                    &#9003;
+                  </button>
+                </div>
               </form>
               {feedback && (
                 <p className={`game-feedback game-feedback-${feedback.tone}`} aria-live="polite">

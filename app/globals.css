@@ -80,6 +80,12 @@ h3,
   padding: 0.68em 1.5em;
   font-size: 0.85vw;
   white-space: nowrap;
+  cursor: pointer;
+  transition: transform 70ms ease-out, filter 120ms ease;
+}
+.button:not(:disabled):active {
+  transform: translateY(1px) scale(0.97);
+  filter: brightness(0.92);
 }
 .button-small {
   padding: 0.65em 1.25em;
@@ -158,6 +164,18 @@ h1 {
 @keyframes caret-blink {
   50% { opacity: 0; }
 }
+.typing-letter {
+  display: inline-block;
+  animation: letter-pop 140ms ease-out;
+}
+.typing-letter-faded {
+  color: #9a9da5;
+  opacity: 0.6;
+}
+@keyframes letter-pop {
+  0% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
 .key-summary {
   margin: 0;
   font-size: 1.2vw;
@@ -176,6 +194,9 @@ h1 {
   display: grid;
   grid-template-rows: 1fr auto auto 1fr;
   justify-items: center;
+  box-shadow: 0 3px 0 rgba(29, 34, 44, 0.16);
+  transition: transform 70ms ease-out, box-shadow 70ms ease-out,
+    background-color 160ms ease, filter 120ms ease;
 }
 .key strong {
   font-size: 1.4vw;
@@ -191,6 +212,19 @@ h1 {
 }
 .key-interactive {
   cursor: pointer;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+.key-interactive:hover {
+  filter: brightness(1.04);
+}
+.key-interactive:active {
+  transform: translateY(2px) scale(0.96);
+  box-shadow: 0 1px 0 rgba(29, 34, 44, 0.16);
+  filter: brightness(0.95);
 }
 .key-interactive:focus-visible {
   outline: 2px solid var(--ink);
@@ -612,24 +646,21 @@ h1 {
   font-family: var(--font-paytone-one), sans-serif;
   letter-spacing: 0;
 }
-.typing-input {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  margin: 0;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: transparent;
-  caret-color: transparent;
-  font-size: 16px;
-}
-.typing-input:focus {
-  outline: none;
+.game-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 0.6vw;
+  margin-top: 1.2vw;
 }
 .game-add {
-  width: 100%;
-  margin-top: 1.2vw;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.game-backspace {
+  flex: 0 0 auto;
+  padding-left: 1em;
+  padding-right: 1em;
+  font-size: 1.1em;
 }
 .game-feedback {
   display: inline-block;
@@ -817,8 +848,11 @@ h1 {
   .typing-placeholder {
     font-family: var(--font-paytone-one), sans-serif;
   }
-  .game-add {
+  .game-actions {
     margin-top: 12px;
+    gap: 8px;
+  }
+  .game-add {
     font-size: 3.4vw;
   }
   .game-feedback {
@@ -953,6 +987,10 @@ h1 {
     font-size: 18px;
     min-height: 56px;
   }
+  .game-backspace {
+    font-size: 20px;
+    min-height: 56px;
+  }
   .game-feedback,
   .found-empty,
   .word-definition,
@@ -1066,5 +1104,15 @@ h1 {
   }
   .footer-content nav a {
     padding: 6px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typing-letter {
+    animation: none;
+  }
+  .key,
+  .button {
+    transition: none;
   }
 }
