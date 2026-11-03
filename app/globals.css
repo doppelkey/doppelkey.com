@@ -976,3 +976,55 @@ h1 {
     width: 90%;
   }
 }
+
+/* Landing page phone polish */
+@media (max-width: 820px) {
+  .hero-content {
+    gap: 36px;
+    padding: 36px 0 48px;
+  }
+  .hero-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .hero-actions .button {
+    width: 100%;
+  }
+  .puzzle-card {
+    padding: 22px 20px 20px;
+  }
+  .puzzle-header {
+    margin-bottom: 14px;
+  }
+  .puzzle-card h2 {
+    font-size: clamp(40px, 12vw, 56px);
+    margin-bottom: 16px;
+    min-height: 1em;
+  }
+  .puzzle-footer {
+    flex-wrap: wrap;
+    overflow: visible;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .puzzle-footer .status {
+    flex: 0 0 auto;
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .word-list {
+    gap: 8px;
+  }
+  .cta-content .button {
+    width: 100%;
+  }
+  .footer-content nav {
+    gap: 8px 20px;
+  }
+  .footer-content nav a {
+    padding: 6px 0;
+  }
+}
