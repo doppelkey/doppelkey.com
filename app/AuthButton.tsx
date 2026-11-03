@@ -26,20 +26,27 @@ export default function AuthButton() {
 
   if (!session) {
     return (
-      <button className="button button-small button-outline" type="button" onClick={() => signInWithGoogle()}>
+      <button
+        className="button button-small button-outline"
+        type="button"
+        onClick={() => signInWithGoogle()}
+      >
         Sign in
       </button>
     );
   }
 
   return (
-    <button
-      className="button button-small button-outline"
-      type="button"
-      onClick={() => getSupabase().auth.signOut()}
-      title="Sign out"
-    >
-      {name && <span className="auth-name">{name} · </span>}Sign out
-    </button>
+    <>
+      <a href="/account">Account</a>
+      <button
+        className="button button-small button-outline"
+        type="button"
+        onClick={() => getSupabase().auth.signOut()}
+        title="Sign out"
+      >
+        {name && <span className="auth-name">{name} · </span>}Sign out
+      </button>
+    </>
   );
 }
