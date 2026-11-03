@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AuthButton from "./AuthButton";
 
 const keys = [
   ["1", ""],
@@ -37,6 +38,8 @@ function Header() {
         <a href="#how-it-works">How to play</a>
         <a href="#archive">Examples</a>
         <a href="#about">About</a>
+        <a href="/leaderboard">Leaderboard</a>
+        <AuthButton />
         <a className="button button-small" href="/game">
           Play today
         </a>

@@ -42,3 +42,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 time-up screen come from the [Datamuse API](https://datamuse.com/api/) at
 runtime; it is free without an API key until 2027-02-01, after which a key is
 required (100,000 requests/day per key).
+
+## Accounts, ranked rounds and leaderboards (Supabase)
+
+- Login: Google through Supabase Auth. The browser only uses the project URL and the publishable key (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, both safe to expose; defaults are in `lib/supabase.ts`). Never add a secret key to the app or this repo.
+- Database: `supabase/migrations/*.sql` holds the schema, row-level security and the functions the app calls. The day resets at midnight IST; each player gets one ranked round per day. The server records the round start, checks words against its own copy of the dictionary and computes the score.
+- `scripts/load-dictionary.mjs` loads `public/wordlist.txt` into the database (needs `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_REF` in the environment).
+- Streak: consecutive IST days on which a player started a ranked round. A missed IST day resets it.
