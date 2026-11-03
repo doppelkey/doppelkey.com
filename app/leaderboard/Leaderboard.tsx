@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AuthButton from "../AuthButton";
 import { getSupabase, signInWithGoogle, type MyStats } from "@/lib/supabase";
 import { useAuth } from "@/lib/useAuth";
@@ -42,8 +42,6 @@ export default function Leaderboard() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState(false);
   const [stats, setStats] = useState<MyStats | null>(null);
-  const [nameDraft, setNameDraft] = useState("");
-  const [nameMessage, setNameMessage] = useState("");
 
   useEffect(() => {
     // Computed after mount so the server prerender does not bake in a day.
@@ -81,7 +79,6 @@ export default function Leaderboard() {
       .then(({ data }) => {
         const next = (data as MyStats | null) ?? null;
         setStats(next);
-        if (next?.display_name) setNameDraft(next.display_name);
       });
   }, []);
 
@@ -91,24 +88,6 @@ export default function Leaderboard() {
     else setStats(null);
   }, [userId, loadStats]);
 
-  const saveName = (event: FormEvent) => {
-    event.preventDefault();
-    getSupabase()
-      .rpc("set_display_name", { p_name: nameDraft })
-      .then(({ error: rpcError }) => {
-        if (rpcError) {
-          setNameMessage("Use 2 to 24 letters, numbers, spaces or . _ - '");
-          return;
-        }
-        setNameMessage("Saved.");
-        loadStats();
-        if (day) {
-          getSupabase()
-            .rpc("get_leaderboard", { p_day: day, p_limit: 50 })
-            .then(({ data }) => data && setRows(data as Row[]));
-        }
-      });
-  };
 
   return (
     <div className="page-shell" id="top">
@@ -209,21 +188,7 @@ export default function Leaderboard() {
               to play ranked rounds and appear here.
             </p>
           )}
-          {session && stats && (
-            <form className="leaderboard-name-form" onSubmit={saveName}>
-              <label htmlFor="display-name">Your name on the board</label>
-              <input
-                id="display-name"
-                value={nameDraft}
-                maxLength={24}
-                onChange={(event) => setNameDraft(event.target.value)}
-              />
-              <button className="button button-small" type="submit">
-                Save
-              </button>
-              {nameMessage && <span>{nameMessage}</span>}
-            </form>
-          )}
+
         </div>
       </section>
     </div>
