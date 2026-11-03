@@ -166,6 +166,10 @@ export default function Game() {
     inputRef.current?.focus();
   };
 
+  const progressPct = possibleWords.length
+    ? Math.round((found.length / possibleWords.length) * 100)
+    : 0;
+
   return (
     <div className="page-shell" id="top">
       <section className="game-section">
@@ -182,96 +186,116 @@ export default function Game() {
             </Link>
           </nav>
         </header>
-        <div className="content-wrap game-layout">
-          <div className="game-copy">
+        <div className="content-wrap">
+          <div className="game-hero">
             <p className="eyebrow">TODAY&apos;S PUZZLE</p>
             <h1 className="game-digits">
               {mounted ? digits.join(" · ") : "· · · ·"}
             </h1>
             <p className="game-date">{mounted ? dateLabel : "Loading"}</p>
-            <p className="game-timer">{formatTime(secondsLeft)}</p>
-            <p className="game-progress">
-              {found.length} of {possibleWords.length || "…"} words found
-            </p>
-            <p className="game-rules">
-              Words need four or more letters. Reuse any letter as often as you
-              like.
-            </p>
           </div>
-          <div className="puzzle-card game-card">
-            <div className="puzzle-header">
-              <div className="puzzle-meta">Today&apos;s digits</div>
-              <p className="key-summary">
-                {mounted ? digits.join(" · ") : ""}
-              </p>
-            </div>
-            <div className="keypad">
-              {KEYS.map(([number, letters]) => (
+          <div className="game-board">
+            <div className="game-panel panel-status">
+              <p className="panel-label">Time left</p>
+              <p className="game-timer">{formatTime(secondsLeft)}</p>
+              <div className="progress-track" aria-hidden="true">
                 <div
-                  className={`key ${digits.includes(number) ? "key-active" : ""}`}
-                  key={number}
-                >
-                  <strong>{number}</strong>
-                  <span>{letters}</span>
-                </div>
-              ))}
-            </div>
-            <form className="word-form" onSubmit={submitWord}>
-              <input
-                ref={inputRef}
-                className="word-input"
-                type="text"
-                value={input}
-                onChange={(event) =>
-                  setInput(event.target.value.replace(/[^a-zA-Z]/g, ""))
-                }
-                placeholder={gameOver ? "Time is up" : "Build a word"}
-                autoComplete="off"
-                autoCapitalize="characters"
-                disabled={!mounted || gameOver}
-                aria-label="Word built from today's digits"
-              />
-              <button className="button" type="submit" disabled={!mounted || gameOver}>
-                Add
-              </button>
-            </form>
-            <div className="letter-bank" aria-label="Letters available today">
-              {letterBank.map(({ digit, letter }) => (
-                <button
-                  type="button"
-                  className="letter-chip"
-                  key={`${digit}-${letter}`}
-                  onClick={() => appendLetter(letter)}
-                  disabled={!mounted || gameOver}
-                >
-                  {letter}
-                </button>
-              ))}
-            </div>
-            {feedback && (
-              <p className={`game-feedback game-feedback-${feedback.tone}`} aria-live="polite">
-                {feedback.text}
+                  className="progress-fill"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+              <p className="game-progress">
+                {found.length} of {possibleWords.length || "…"} words found
               </p>
-            )}
-            <div className="found-words">
-              {found.map((word) => (
-                <span className="status status-teal" key={word}>
-                  {word.toUpperCase()}
-                </span>
-              ))}
-              {gameOver &&
-                missedWords.map((word) => (
-                  <span className="status status-missing" key={word}>
+              <p className="game-rules">
+                Words need four or more letters. Reuse any letter as often as
+                you like.
+              </p>
+            </div>
+            <div className="game-panel panel-keypad">
+              <div className="puzzle-header">
+                <p className="panel-label">Today&apos;s keypad</p>
+                <p className="key-summary">
+                  {mounted ? digits.join(" · ") : ""}
+                </p>
+              </div>
+              <div className="keypad">
+                {KEYS.map(([number, letters]) => (
+                  <div
+                    className={`key ${digits.includes(number) ? "key-active" : ""}`}
+                    key={number}
+                  >
+                    <strong>{number}</strong>
+                    <span>{letters}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="game-panel panel-entry">
+              <p className="panel-label">Build a word</p>
+              <form className="word-form" onSubmit={submitWord}>
+                <input
+                  ref={inputRef}
+                  className="word-input"
+                  type="text"
+                  value={input}
+                  onChange={(event) =>
+                    setInput(event.target.value.replace(/[^a-zA-Z]/g, ""))
+                  }
+                  placeholder={gameOver ? "Time is up" : "Type or tap letters"}
+                  autoComplete="off"
+                  autoCapitalize="characters"
+                  disabled={!mounted || gameOver}
+                  aria-label="Word built from today's digits"
+                />
+                <button className="button" type="submit" disabled={!mounted || gameOver}>
+                  Add
+                </button>
+              </form>
+              <div className="letter-bank" aria-label="Letters available today">
+                {letterBank.map(({ digit, letter }) => (
+                  <button
+                    type="button"
+                    className="letter-chip"
+                    key={`${digit}-${letter}`}
+                    onClick={() => appendLetter(letter)}
+                    disabled={!mounted || gameOver}
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
+              {feedback && (
+                <p className={`game-feedback game-feedback-${feedback.tone}`} aria-live="polite">
+                  {feedback.text}
+                </p>
+              )}
+            </div>
+            <div className="game-panel panel-found">
+              <p className="panel-label">Found words</p>
+              <div className="found-words">
+                {found.map((word) => (
+                  <span className="status status-teal" key={word}>
                     {word.toUpperCase()}
                   </span>
                 ))}
+                {gameOver &&
+                  missedWords.map((word) => (
+                    <span className="status status-missing" key={word}>
+                      {word.toUpperCase()}
+                    </span>
+                  ))}
+              </div>
+              {found.length === 0 && !gameOver && (
+                <p className="found-empty">Words you find will land here.</p>
+              )}
+              {gameOver && (
+                <p className="found-copy">
+                  Time&apos;s up. You found {found.length} of {possibleWords.length}{" "}
+                  words. Solid letters are yours, dashed ones got away.
+                </p>
+              )}
             </div>
-            {gameOver && (
-              <p className="found-copy">
-                Time&apos;s up. You found {found.length} of {possibleWords.length}{" "}
-                words. Solid letters are yours, dashed ones got away.
-              </p>
-            )}
           </div>
         </div>
       </section>
