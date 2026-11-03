@@ -347,7 +347,7 @@ h1 {
   color: #60636a;
   font-size: 0.55vw;
 }
-@media (max-width: 600px) {
+@media (max-width: 820px) {
   .content-wrap,
   .site-header {
     width: 86%;
@@ -728,7 +728,7 @@ h1 {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 820px) {
   .game-section {
     min-height: auto;
     padding-bottom: 56px;
@@ -807,7 +807,7 @@ h1 {
 }
 
 /* Game page mobile readability minimums (scoped so the landing page is untouched) */
-@media (max-width: 600px) {
+@media (max-width: 820px) {
   .game-section .brand {
     font-size: 18px;
   }
@@ -818,5 +818,147 @@ h1 {
   }
   .game-section .eyebrow {
     font-size: 12px;
+  }
+}
+
+/* Phone and small-tablet sizing: vw-based type shrinks with the screen, so set readable minimums here. */
+@media (max-width: 820px) {
+  body {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+  .page-shell {
+    min-width: 0;
+  }
+  .brand {
+    font-size: 22px;
+  }
+  .button,
+  .game-section .main-nav .button {
+    font-size: 16px;
+    min-height: 48px;
+    padding: 12px 22px;
+  }
+  .button-small,
+  .game-section .main-nav .button {
+    min-height: 44px;
+    padding: 10px 18px;
+    font-size: 15px;
+  }
+  .eyebrow,
+  .game-section .eyebrow,
+  .puzzle-meta,
+  .panel-label {
+    font-size: 13px;
+  }
+  .hero-description,
+  .step p,
+  .example-copy p {
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  .hero-description {
+    width: 100%;
+  }
+  .key-summary,
+  .panel-keypad .key-summary,
+  .puzzle-card .key-summary {
+    font-size: 14px;
+  }
+  .keypad {
+    gap: 8px;
+  }
+  .key {
+    height: 64px;
+    border-radius: 10px;
+  }
+  .key strong {
+    font-size: 22px;
+  }
+  .key span {
+    font-size: 16px;
+  }
+  .how-section h2,
+  .cta-content h2 {
+    font-size: 32px;
+  }
+  .step h3 {
+    font-size: 22px;
+  }
+  .step-number {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+  .word-example strong {
+    font-size: 22px;
+  }
+  .word-list span {
+    font-size: 16px;
+  }
+  .status {
+    font-size: 15px;
+    padding: 10px 14px;
+    min-height: 40px;
+  }
+  .found-copy {
+    font-size: 14px;
+  }
+  .footer-content,
+  .footer-content nav {
+    font-size: 15px;
+  }
+  .game-date,
+  .game-progress,
+  .game-rules {
+    font-size: 15px;
+  }
+  .game-timer {
+    font-size: 44px;
+  }
+  .panel-keypad .typing-word {
+    font-size: clamp(40px, 12vw, 56px);
+  }
+  .game-add {
+    font-size: 18px;
+    min-height: 56px;
+  }
+  .game-feedback,
+  .found-empty,
+  .word-definition,
+  .panel-found .found-copy {
+    font-size: 15px;
+  }
+  .found-words {
+    gap: 8px;
+  }
+  .found-words .status {
+    font-size: 15px;
+  }
+  .key-summary,
+  .panel-keypad .key-summary,
+  .puzzle-card .key-summary {
+    font-size: 16px;
+  }
+  .example-copy h2 {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+  .footer-content strong {
+    font-size: 20px;
+  }
+  .footer-content small {
+    font-size: 14px;
+    margin-top: 6px;
+  }
+  .puzzle-footer .status {
+    font-size: 14px;
+    padding: 10px 6px;
+    min-height: 0;
+    flex: 1 1 0;
+    text-align: center;
+  }
+  .game-loading-text {
+    font-size: 20px;
   }
 }
