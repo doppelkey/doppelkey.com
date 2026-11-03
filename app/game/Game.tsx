@@ -55,7 +55,9 @@ export default function Game() {
   const [found, setFound] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<{ tone: "info" | "good" | "bad"; text: string } | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(ROUND_SECONDS);
+  const [keypadSelection, setKeypadSelection] = useState<{ digit: string; index: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const keypadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Date-seeded digits differ between server prerender and the player's
@@ -108,14 +110,6 @@ export default function Game() {
     return letters;
   }, [digits]);
 
-  const letterBank = useMemo(
-    () =>
-      digits.flatMap((digit) =>
-        [...KEY_LETTERS[digit]].map((letter) => ({ digit, letter }))
-      ),
-    [digits]
-  );
-
   const possibleWords = useMemo(() => {
     if (!dictionary || allowedLetters.size === 0) return [];
     const matches: string[] = [];
@@ -160,10 +154,31 @@ export default function Game() {
     setFeedback({ tone: "good", text: `${word.toUpperCase()} added.` });
   };
 
-  const appendLetter = (letter: string) => {
+  useEffect(() => {
+    return () => {
+      if (keypadTimerRef.current) clearTimeout(keypadTimerRef.current);
+    };
+  }, []);
+
+  const pressKeypadKey = (digit: string) => {
     if (gameOver) return;
-    setInput((value) => value + letter);
+    const letters = KEY_LETTERS[digit];
+    if (!letters) return;
+
+    const isSameKey = keypadSelection?.digit === digit;
+    const nextIndex = isSameKey ? (keypadSelection.index + 1) % letters.length : 0;
+    const nextLetter = letters[nextIndex];
+
+    setInput((value) => (isSameKey ? value.slice(0, -1) : value) + nextLetter);
+    setKeypadSelection({ digit, index: nextIndex });
+    if (keypadTimerRef.current) clearTimeout(keypadTimerRef.current);
+    keypadTimerRef.current = setTimeout(() => setKeypadSelection(null), 900);
     inputRef.current?.focus();
+  };
+
+  const handleInputChange = (value: string) => {
+    setInput(value.replace(/[^a-zA-Z]/g, ""));
+    setKeypadSelection(null);
   };
 
   const progressPct = possibleWords.length
@@ -222,8 +237,17 @@ export default function Game() {
               <div className="keypad">
                 {KEYS.map(([number, letters]) => (
                   <div
-                    className={`key ${digits.includes(number) ? "key-active" : ""}`}
+                    className={`key ${digits.includes(number) ? "key-active" : ""} ${letters ? "key-interactive" : ""}`}
                     key={number}
+                    role={letters ? "button" : undefined}
+                    tabIndex={letters ? 0 : undefined}
+                    onClick={() => pressKeypadKey(number)}
+                    onKeyDown={(event) => {
+                      if (letters && (event.key === "Enter" || event.key === " ")) {
+                        event.preventDefault();
+                        pressKeypadKey(number);
+                      }
+                    }}
                   >
                     <strong>{number}</strong>
                     <span>{letters}</span>
@@ -239,9 +263,7 @@ export default function Game() {
                   className="word-input"
                   type="text"
                   value={input}
-                  onChange={(event) =>
-                    setInput(event.target.value.replace(/[^a-zA-Z]/g, ""))
-                  }
+                  onChange={(event) => handleInputChange(event.target.value)}
                   placeholder={gameOver ? "Time is up" : "Type or tap letters"}
                   autoComplete="off"
                   autoCapitalize="characters"
@@ -252,19 +274,6 @@ export default function Game() {
                   Add
                 </button>
               </form>
-              <div className="letter-bank" aria-label="Letters available today">
-                {letterBank.map(({ digit, letter }) => (
-                  <button
-                    type="button"
-                    className="letter-chip"
-                    key={`${digit}-${letter}`}
-                    onClick={() => appendLetter(letter)}
-                    disabled={!mounted || gameOver}
-                  >
-                    {letter}
-                  </button>
-                ))}
-              </div>
               {feedback && (
                 <p className={`game-feedback game-feedback-${feedback.tone}`} aria-live="polite">
                   {feedback.text}

@@ -189,6 +189,13 @@ h1 {
 .key-active {
   background: var(--orange);
 }
+.key-interactive {
+  cursor: pointer;
+}
+.key-interactive:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
 .puzzle-footer {
   display: flex;
   align-items: center;
