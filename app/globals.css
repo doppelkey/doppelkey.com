@@ -596,10 +596,16 @@ h1 {
 .panel-keypad .typing-word {
   min-height: 1em;
   font-family: var(--font-paytone-one), sans-serif;
-  font-size: clamp(26px, 4.2vw, 56px);
+  font-size: 4.2vw;
   line-height: 1;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.panel-keypad .typing-word::-webkit-scrollbar {
+  display: none;
 }
 .typing-placeholder {
   color: #9a9da5;
@@ -722,7 +728,7 @@ h1 {
     margin-bottom: 4vw;
   }
   .panel-keypad .typing-word {
-    font-size: clamp(26px, 11vw, 40px);
+    font-size: 11vw;
   }
   .typing-placeholder {
     font-size: 3.2vw;

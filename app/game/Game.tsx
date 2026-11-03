@@ -57,6 +57,7 @@ export default function Game() {
   const [secondsLeft, setSecondsLeft] = useState(ROUND_SECONDS);
   const [keypadSelection, setKeypadSelection] = useState<{ digit: string; index: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const typingRef = useRef<HTMLDivElement>(null);
   const keypadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -176,6 +177,12 @@ export default function Game() {
     inputRef.current?.focus();
   };
 
+  useEffect(() => {
+    // Keep the caret end of the scrolling typing display in view.
+    const el = typingRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [input]);
+
   const handleInputChange = (value: string) => {
     setInput(value.replace(/[^a-zA-Z]/g, ""));
     setKeypadSelection(null);
@@ -236,7 +243,7 @@ export default function Game() {
               </div>
               <form className="keypad-form" onSubmit={submitWord}>
                 <div className="typing-shell">
-                  <div className="typing-word" aria-hidden="true">
+                  <div className="typing-word" ref={typingRef} aria-hidden="true">
                     {input ? (
                       input.toUpperCase()
                     ) : gameOver ? (
