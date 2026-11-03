@@ -96,7 +96,7 @@ export default function Game() {
           .split("\n")
           .map((word) => word.trim())
           .filter((word) => /^[a-z]{4,}$/.test(word));
-        if (words.length < 1000) throw new Error("Wordlist failed validation");
+        if (words.length < 100000) throw new Error("Wordlist failed validation");
         setDictionary(new Set(words));
         setWordlistState("ready");
       })

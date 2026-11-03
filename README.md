@@ -37,7 +37,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Wordlist and definitions
 
-`public/wordlist.txt` is Doppelkey's curated offline wordlist (see
+`public/wordlist.txt` is Doppelkey's full offline wordlist (the Letterpress-derived list, 273k words) (see
 `public/wordlist.LICENSE.txt` for sources and licenses). Definitions on the
 time-up screen come from the [Datamuse API](https://datamuse.com/api/) at
 runtime; it is free without an API key until 2027-02-01, after which a key is

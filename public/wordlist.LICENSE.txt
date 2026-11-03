@@ -1,19 +1,11 @@
 wordlist.txt is derived from the npm package "an-array-of-english-words"
-(https://github.com/words/an-array-of-english-words, MIT License), itself
-derived from the Letterpress word list, curated down to the words appearing
-in the top ~12,000 most frequent English words of the FrequencyWords
-OpenSubtitles corpus (https://github.com/hermitdave/FrequencyWords,
-MIT License, Copyright (c) 2016 Hermit Dave), limited to words of four or
-more lowercase letters, with common profanity excluded, for use as
-Doppelkey's offline wordlist.
+(https://github.com/words/an-array-of-english-words), itself derived from
+the Letterpress word list, filtered to words of four or more lowercase
+letters for use as Doppelkey's offline word list.
 
-The MIT License (an-array-of-english-words)
+The MIT License
 
 Copyright (c) 2014 Zeke Sikelianos <zeke@sikelianos.com>
-
-The MIT License (FrequencyWords)
-
-Copyright (c) 2016 Hermit Dave
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
