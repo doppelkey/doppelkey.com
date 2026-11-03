@@ -962,3 +962,17 @@ h1 {
     font-size: 20px;
   }
 }
+
+@media (max-width: 340px) {
+  .panel-keypad .key-summary {
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  .panel-keypad .typing-word {
+    font-size: 34px;
+  }
+  .game-section .site-header,
+  .game-section .content-wrap {
+    width: 90%;
+  }
+}
