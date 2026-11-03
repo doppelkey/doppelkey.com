@@ -34,3 +34,11 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Wordlist and definitions
+
+`public/wordlist.txt` is Doppelkey's curated offline wordlist (see
+`public/wordlist.LICENSE.txt` for sources and licenses). Definitions on the
+time-up screen come from the [Datamuse API](https://datamuse.com/api/) at
+runtime; it is free without an API key until 2027-02-01, after which a key is
+required (100,000 requests/day per key).
