@@ -647,8 +647,8 @@ h1 {
   letter-spacing: 0;
 }
 .game-actions {
-  display: flex;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.6vw;
   margin-top: 1.2vw;
 }
@@ -657,10 +657,14 @@ h1 {
   min-width: 0;
 }
 .game-backspace {
-  flex: 0 0 auto;
-  padding-left: 1em;
-  padding-right: 1em;
-  font-size: 1.1em;
+  width: 4.5em;
+  padding: 0.65em;
+  background: var(--teal);
+  border-color: var(--teal);
+}
+.game-backspace img {
+  width: 1.45em;
+  height: 1.45em;
 }
 .game-feedback {
   display: inline-block;

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 const KEYS: [string, string][] = [
@@ -355,13 +356,19 @@ export default function Game() {
                     Add word
                   </button>
                   <button
-                    className="button button-outline game-backspace"
+                    className="button game-backspace"
                     type="button"
                     onClick={backspaceWord}
                     disabled={!ready || gameOver || input.length === 0}
                     aria-label="Delete last letter"
                   >
-                    &#9003;
+                    <Image
+                      src="/backspace.svg"
+                      alt=""
+                      aria-hidden="true"
+                      width={24}
+                      height={24}
+                    />
                   </button>
                 </div>
               </form>
