@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import AuthButton from "../AuthButton";
+import {
+  getSupabase,
+  signInWithGoogle,
+  type MyStats,
+  type RankedRound,
+} from "@/lib/supabase";
+import { useAuth } from "@/lib/useAuth";
 
 const KEYS: [string, string][] = [
   ["1", ""],
@@ -24,39 +32,39 @@ const MULTI_TAP_MS = 400;
 // 4-letter word = 1 point, +1 point for each extra letter.
 const wordPoints = (word: string) => Math.max(0, word.length - 3);
 
-function mulberry32(seed: number) {
-  return function () {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function dailyDigits(date: Date): string[] {
-  const seed =
-    date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
-  const rand = mulberry32(seed);
-  const pool = KEYS.map(([digit]) => digit).filter((digit) => digit !== "1");
-  const picks: string[] = [];
-  while (picks.length < 4) {
-    const digit = pool[Math.floor(rand() * pool.length)];
-    if (!picks.includes(digit)) picks.push(digit);
-  }
-  return picks.sort();
-}
-
 function formatTime(totalSeconds: number) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
+// Ranked rounds keep their found words here so a page reload mid-round does
+// not lose them. The server still validates every word when the round ends.
+const foundStorageKey = (roundId: string) => `doppelkey-found-${roundId}`;
+
+function dayLabel(day: string) {
+  return new Date(`${day}T00:00:00Z`).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 export default function Game() {
-  const [mounted, setMounted] = useState(false);
+  const { ready: authReady, session } = useAuth();
+  const ranked = Boolean(session);
+  const userId = session?.user.id;
   const [digits, setDigits] = useState<string[]>([]);
   const [dateLabel, setDateLabel] = useState("");
+  const [puzzleState, setPuzzleState] = useState<"loading" | "ready" | "error">("loading");
+  const [round, setRound] = useState<RankedRound | null>(null);
+  const [roundState, setRoundState] = useState<"loading" | "ready" | "error">("loading");
+  const [deadlineMs, setDeadlineMs] = useState<number | null>(null);
+  const [starting, setStarting] = useState(false);
+  const [submitState, setSubmitState] = useState<"idle" | "submitting" | "error">("idle");
+  const [stats, setStats] = useState<MyStats | null>(null);
   const [dictionary, setDictionary] = useState<Set<string> | null>(null);
   const [wordlistState, setWordlistState] = useState<"loading" | "ready" | "error">("loading");
   const [input, setInput] = useState("");
@@ -74,24 +82,100 @@ export default function Game() {
   const typingRef = useRef<HTMLDivElement>(null);
   const keypadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    // Date-seeded digits differ between server prerender and the player's
-    // local day, so compute them after mount inside an async callback.
-    const frame = requestAnimationFrame(() => {
-      const now = new Date();
-      setDigits(dailyDigits(now));
-      setDateLabel(
-        now.toLocaleDateString("en-US", {
-          weekday: "long",
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        })
-      );
-      setMounted(true);
-    });
-    return () => cancelAnimationFrame(frame);
+  const loadPuzzle = useCallback(() => {
+    setPuzzleState("loading");
+    getSupabase()
+      .rpc("get_daily_puzzle")
+      .then(({ data, error }) => {
+        const puzzle = data as { day: string; digits: string } | null;
+        if (error || !puzzle) {
+          setPuzzleState("error");
+          return;
+        }
+        setDigits(puzzle.digits.split("").sort());
+        setDateLabel(dayLabel(puzzle.day));
+        setPuzzleState("ready");
+      });
   }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loads data from the server
+    loadPuzzle();
+  }, [loadPuzzle]);
+
+  const applyRound = useCallback((next: RankedRound) => {
+    // Use the server's clock for the deadline so a wrong device clock cannot
+    // stretch or shorten the round.
+    const offset = Date.parse(next.server_now) - Date.now();
+    setDeadlineMs(Date.parse(next.deadline) - offset);
+    setRound(next);
+  }, []);
+
+  const loadStats = useCallback(() => {
+    getSupabase()
+      .rpc("my_stats")
+      .then(({ data }) => setStats((data as MyStats | null) ?? null));
+  }, []);
+
+  const loadRound = useCallback(() => {
+    setRoundState("loading");
+    getSupabase()
+      .rpc("get_my_round")
+      .then(({ data, error }) => {
+        if (error) {
+          setRoundState("error");
+          return;
+        }
+        const existing = data as RankedRound | null;
+        if (existing) {
+          applyRound(existing);
+          if (existing.status === "started") {
+            try {
+              const saved = localStorage.getItem(foundStorageKey(existing.id));
+              if (saved) setFound(JSON.parse(saved));
+            } catch {}
+          } else {
+            setFound(existing.words);
+          }
+        } else {
+          setRound(null);
+        }
+        setRoundState("ready");
+      });
+    loadStats();
+  }, [applyRound, loadStats]);
+
+  useEffect(() => {
+    if (!authReady) return;
+    if (userId) {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loads data from the server
+      loadRound();
+    } else {
+      setRound(null);
+      setStats(null);
+      setFound([]);
+      setRoundState("ready");
+    }
+  }, [authReady, userId, loadRound]);
+
+  const startRankedRound = () => {
+    setStarting(true);
+    getSupabase()
+      .rpc("start_round")
+      .then(({ data, error }) => {
+        setStarting(false);
+        if (error || !data) {
+          setFeedback({ tone: "bad", text: "Couldn't start the round. Try again." });
+          return;
+        }
+        const next = data as RankedRound;
+        applyRound(next);
+        setSecondsLeft(
+          Math.max(0, Math.ceil((Date.parse(next.deadline) - Date.parse(next.server_now)) / 1000))
+        );
+        loadStats();
+      });
+  };
 
   const fetchWordlist = () =>
     fetch("/wordlist.txt")
@@ -114,20 +198,84 @@ export default function Game() {
     fetchWordlist();
   }, []);
 
-  const retryWordlist = () => {
-    setWordlistState("loading");
-    fetchWordlist();
+  const retryLoad = () => {
+    if (wordlistState === "error") {
+      setWordlistState("loading");
+      fetchWordlist();
+    }
+    if (puzzleState === "error") loadPuzzle();
+    if (roundState === "error" && userId) loadRound();
   };
 
-  const ready = mounted && wordlistState === "ready";
+  const loadReady =
+    authReady &&
+    puzzleState === "ready" &&
+    wordlistState === "ready" &&
+    roundState === "ready";
+  const rankedLive = ranked && round?.status === "started";
+  // True while the player may type: a practice round (signed out) or an open
+  // ranked round.
+  const ready = loadReady && (!ranked || rankedLive);
 
   useEffect(() => {
-    if (!ready) return;
+    // Practice timer starts only once the wordlist and puzzle have loaded.
+    if (!ready || ranked) return;
     const timer = setInterval(() => {
       setSecondsLeft((value) => (value > 0 ? value - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
-  }, [ready]);
+  }, [ready, ranked]);
+
+  useEffect(() => {
+    // Ranked timer follows the server-issued deadline.
+    if (!rankedLive || deadlineMs === null) return;
+    const tick = () =>
+      setSecondsLeft(Math.max(0, Math.ceil((deadlineMs - Date.now()) / 1000)));
+    tick();
+    const timer = setInterval(tick, 500);
+    return () => clearInterval(timer);
+  }, [rankedLive, deadlineMs]);
+
+  useEffect(() => {
+    if (!rankedLive || !round) return;
+    try {
+      localStorage.setItem(foundStorageKey(round.id), JSON.stringify(found));
+    } catch {}
+  }, [found, rankedLive, round]);
+
+  const submitRound = useCallback(() => {
+    if (!round || submitState === "submitting") return;
+    setSubmitState("submitting");
+    getSupabase()
+      .rpc("finish_round", { p_words: found })
+      .then(({ data, error }) => {
+        if (error || !data) {
+          // Too early by a hair, or a dropped connection: retry shortly.
+          setSubmitState("error");
+          return;
+        }
+        const finished = data as RankedRound;
+        setRound(finished);
+        setFound(finished.words);
+        setSubmitState("idle");
+        try {
+          localStorage.removeItem(foundStorageKey(finished.id));
+        } catch {}
+        loadStats();
+      });
+  }, [round, found, submitState, loadStats]);
+
+  useEffect(() => {
+    if (!rankedLive || secondsLeft > 0 || submitState !== "idle") return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loads data from the server
+    submitRound();
+  }, [rankedLive, secondsLeft, submitState, submitRound]);
+
+  useEffect(() => {
+    if (submitState !== "error" || !rankedLive) return;
+    const retry = setTimeout(() => setSubmitState("idle"), 3000);
+    return () => clearTimeout(retry);
+  }, [submitState, rankedLive]);
 
   const allowedLetters = useMemo(() => {
     const letters = new Set<string>();
@@ -147,8 +295,10 @@ export default function Game() {
     return matches;
   }, [dictionary, allowedLetters]);
 
-  const gameOver = ready && secondsLeft <= 0;
-  const showGameOverOverlay = gameOver && !overlayDismissed;
+  const rankedDone = ranked && round !== null && round.status !== "started";
+  const gameOver = rankedDone || (ready && secondsLeft <= 0);
+  const showGameOverOverlay =
+    gameOver && !overlayDismissed && !rankedLive;
   const missedWords = gameOver
     ? possibleWords.filter((word) => !found.includes(word))
     : [];
@@ -159,7 +309,7 @@ export default function Game() {
 
   const submitWord = (event: FormEvent) => {
     event.preventDefault();
-    if (gameOver) return;
+    if (gameOver || !ready) return;
     const word = input.trim().toLowerCase();
     setInput("");
     if (word.length < 4) {
@@ -258,7 +408,18 @@ export default function Game() {
       );
   };
 
-  const score = found.reduce((total, word) => total + wordPoints(word), 0);
+  const localScore = found.reduce((total, word) => total + wordPoints(word), 0);
+  // After a ranked round the server's score is the one that counts.
+  const score = rankedDone && round ? round.score : localScore;
+  const rankedNote =
+    rankedDone && round?.status === "expired"
+      ? "Your ranked round ended without a result, so it has no score today."
+      : rankedDone && round?.status === "rejected"
+        ? "That round couldn't be verified, so it has no score today."
+        : null;
+  const streakLabel = stats
+    ? `${stats.current_streak} day${stats.current_streak === 1 ? "" : "s"}`
+    : null;
 
   return (
     <div className="page-shell" id="top">
@@ -271,6 +432,8 @@ export default function Game() {
             <Link href="/#how-it-works">How to play</Link>
             <Link href="/#archive">Examples</Link>
             <Link href="/#about">About</Link>
+            <Link href="/leaderboard">Leaderboard</Link>
+            <AuthButton />
             <Link className="button button-small" href="/">
               Home
             </Link>
@@ -278,11 +441,23 @@ export default function Game() {
         </header>
         <div className="content-wrap">
           <div className="game-hero">
-            <p className="eyebrow">TODAY&apos;S PUZZLE</p>
+            <p className="eyebrow">
+              {ranked ? "TODAY'S RANKED PUZZLE" : "TODAY'S PUZZLE"}
+            </p>
             <h1 className="game-digits">
-              {mounted ? digits.join(" · ") : "· · · ·"}
+              {puzzleState === "ready" ? digits.join(" · ") : "· · · ·"}
             </h1>
-            <p className="game-date">{mounted ? dateLabel : "Loading"}</p>
+            <p className="game-date">{puzzleState === "ready" ? dateLabel : "Loading"}</p>
+            {authReady && !ranked && (
+              <p className="game-mode-note">
+                Practice round, not saved.{" "}
+                <button className="link-button" type="button" onClick={() => signInWithGoogle()}>
+                  Sign in with Google
+                </button>{" "}
+                to play your one ranked round today, keep a streak and join the
+                leaderboard.
+              </p>
+            )}
           </div>
           <div className="game-board">
             <div className="game-panel panel-status">
@@ -291,6 +466,9 @@ export default function Game() {
               <p className="game-progress">
                 Score: {score} {score === 1 ? "point" : "points"}
               </p>
+              {ranked && streakLabel && (
+                <p className="game-streak">Streak: {streakLabel}</p>
+              )}
               <p className="game-rules">
                 Words need four or more letters. A four-letter word is worth 1
                 point, and each extra letter adds 1 more. Reuse any letter as
@@ -301,7 +479,7 @@ export default function Game() {
               <div className="puzzle-header">
                 <p className="panel-label">Today&apos;s keypad</p>
                 <p className="key-summary">
-                  {mounted ? digits.join(" · ") : ""}
+                  {puzzleState === "ready" ? digits.join(" · ") : ""}
                 </p>
               </div>
               <form className="keypad-form" onSubmit={submitWord}>
@@ -422,7 +600,7 @@ export default function Game() {
               )}
               {gameOver && (
                 <p className="found-copy">
-                  Time&apos;s up. You scored {score} {score === 1 ? "point" : "points"} with{" "}
+                  {rankedNote ? `${rankedNote} ` : ""}Time&apos;s up. You scored {score} {score === 1 ? "point" : "points"} with{" "}
                   {found.length} {found.length === 1 ? "word" : "words"}. Solid letters are yours, dashed ones got away. Tap any
                   word for its definition.
                 </p>
@@ -431,22 +609,57 @@ export default function Game() {
           </div>
         </div>
       </section>
-      {wordlistState !== "ready" && (
+      {!loadReady && (
         <div className="game-loading-overlay" role="status" aria-live="polite">
           <div className="game-loading-card">
-            {wordlistState === "error" ? (
+            {wordlistState === "error" || puzzleState === "error" || roundState === "error" ? (
               <>
-                <p className="game-loading-text">Couldn&apos;t load the wordlist</p>
-                <button className="button" type="button" onClick={retryWordlist}>
+                <p className="game-loading-text">
+                  {puzzleState === "error"
+                    ? "Couldn't load today's puzzle"
+                    : roundState === "error"
+                      ? "Couldn't load your round"
+                      : "Couldn't load the wordlist"}
+                </p>
+                <button className="button" type="button" onClick={retryLoad}>
                   Try again
                 </button>
               </>
             ) : (
               <>
                 <span className="game-spinner" aria-hidden="true" />
-                <p className="game-loading-text">Loading wordlist</p>
+                <p className="game-loading-text">
+                  {wordlistState === "loading" ? "Loading wordlist" : "Loading today's puzzle"}
+                </p>
               </>
             )}
+          </div>
+        </div>
+      )}
+      {loadReady && ranked && round === null && (
+        <div className="game-loading-overlay" role="dialog" aria-modal="true" aria-labelledby="ranked-start-title">
+          <div className="game-loading-card game-over-card">
+            <p className="game-over-title" id="ranked-start-title">
+              Ranked round
+            </p>
+            <p className="game-over-copy">
+              You get one ranked attempt per day. The 3 minutes start the
+              moment you tap the button. A new puzzle drops at midnight IST.
+            </p>
+            <button className="button" type="button" onClick={startRankedRound} disabled={starting}>
+              {starting ? "Starting..." : "Start today's round"}
+            </button>
+            {feedback?.tone === "bad" && <p className="game-over-copy">{feedback.text}</p>}
+          </div>
+        </div>
+      )}
+      {rankedLive && secondsLeft <= 0 && (
+        <div className="game-loading-overlay" role="status" aria-live="polite">
+          <div className="game-loading-card">
+            <span className="game-spinner" aria-hidden="true" />
+            <p className="game-loading-text">
+              {submitState === "error" ? "Retrying score submission" : "Checking your words"}
+            </p>
           </div>
         </div>
       )}
@@ -459,7 +672,7 @@ export default function Game() {
         >
           <div className="game-loading-card game-over-card">
             <p className="game-over-title" id="game-over-title">
-              Time&apos;s up!
+              {ranked ? "Ranked score" : "Time\u2019s up!"}
             </p>
             <p className="game-over-score">
               {score}
@@ -471,6 +684,15 @@ export default function Game() {
               You found {found.length}{" "}
               {found.length === 1 ? "word" : "words"}.
             </p>
+            {rankedNote && <p className="game-over-copy">{rankedNote}</p>}
+            {ranked && streakLabel && (
+              <p className="game-over-copy">Streak: {streakLabel}</p>
+            )}
+            {ranked && (
+              <Link className="button button-outline" href="/leaderboard">
+                See the leaderboard
+              </Link>
+            )}
             <button
               className="button"
               type="button"

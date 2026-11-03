@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AuthButton from "./AuthButton";
 
 const keys = [
   ["1", ""],
@@ -37,6 +38,8 @@ function Header() {
         <a href="#how-it-works">How to play</a>
         <a href="#archive">Examples</a>
         <a href="#about">About</a>
+        <a href="/leaderboard">Leaderboard</a>
+        <AuthButton />
         <a className="button button-small" href="/game">
           Play today
         </a>
@@ -151,7 +154,6 @@ export default function Home() {
         <Header />
         <div className="content-wrap hero-content">
           <div className="hero-copy">
-            <p className="eyebrow">A DAILY DIGIT WORD PUZZLE</p>
             <h1>
               Build words
               <br />
