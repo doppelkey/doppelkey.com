@@ -52,8 +52,18 @@ a {
 }
 .brand,
 h1,
-h2,
+h2 {
+  font-family: var(--font-krona-one), sans-serif;
+  font-weight: 400;
+}
 h3,
+.eyebrow,
+.puzzle-meta,
+.panel-label,
+.game-loading-text {
+  font-family: var(--font-liter), sans-serif;
+  font-weight: 400;
+}
 .puzzle-card h2,
 .button {
   font-family: var(--font-paytone-one), sans-serif;
@@ -372,7 +382,8 @@ h1 {
 }
 .footer-content strong {
   display: block;
-  font-family: var(--font-paytone-one), sans-serif;
+  font-family: var(--font-krona-one), sans-serif;
+  font-weight: 400;
   font-size: 0.9vw;
 }
 .footer-content small {
@@ -761,7 +772,6 @@ h1 {
 }
 .game-loading-text {
   margin: 0;
-  font-family: var(--font-paytone-one), sans-serif;
   font-size: clamp(16px, 1.4vw, 20px);
   color: var(--ink);
 }
@@ -778,7 +788,8 @@ h1 {
 }
 .game-over-title {
   margin: 0;
-  font-family: var(--font-paytone-one), sans-serif;
+  font-family: var(--font-krona-one), sans-serif;
+  font-weight: 400;
   font-size: clamp(20px, 1.8vw, 26px);
   color: var(--ink);
 }
@@ -1062,6 +1073,9 @@ h1 {
 }
 
 @media (max-width: 340px) {
+  .brand {
+    font-size: 18px;
+  }
   .panel-keypad .key-summary {
     white-space: nowrap;
     font-size: 14px;

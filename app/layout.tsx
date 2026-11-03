@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans, Paytone_One } from "next/font/google";
+import { Krona_One, Liter, Noto_Sans, Paytone_One } from "next/font/google";
 import "./globals.css";
 
 const notoSans = Noto_Sans({
@@ -8,6 +8,18 @@ const notoSans = Noto_Sans({
 });
 const paytoneOne = Paytone_One({
   variable: "--font-paytone-one",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const kronaOne = Krona_One({
+  variable: "--font-krona-one",
+  subsets: ["latin"],
+  weight: "400",
+});
+const liter = Liter({
+  variable: "--font-liter",
+  adjustFontFallback: false,
   subsets: ["latin"],
   weight: "400",
 });
@@ -21,7 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${notoSans.variable} ${paytoneOne.variable} h-full antialiased`}
+      className={`${notoSans.variable} ${paytoneOne.variable} ${kronaOne.variable} ${liter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
