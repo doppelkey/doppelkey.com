@@ -609,10 +609,8 @@ h1 {
 }
 .typing-placeholder {
   color: #9a9da5;
-  font-family: var(--font-noto-sans), sans-serif;
-  font-size: clamp(12px, 0.9vw, 14px);
+  font-family: var(--font-paytone-one), sans-serif;
   letter-spacing: 0;
-  text-transform: none;
 }
 .typing-input {
   position: absolute;
@@ -731,7 +729,7 @@ h1 {
     font-size: 11vw;
   }
   .typing-placeholder {
-    font-size: 3.2vw;
+    font-family: var(--font-paytone-one), sans-serif;
   }
   .game-add {
     margin-top: 12px;

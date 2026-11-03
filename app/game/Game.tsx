@@ -244,12 +244,12 @@ export default function Game() {
               <form className="keypad-form" onSubmit={submitWord}>
                 <div className="typing-shell">
                   <div className="typing-word" ref={typingRef} aria-hidden="true">
-                    {input ? (
+                    {gameOver ? (
+                      <span className="typing-placeholder">Time's up!</span>
+                    ) : input ? (
                       input.toUpperCase()
-                    ) : gameOver ? (
-                      <span className="typing-placeholder">Time is up</span>
                     ) : null}
-                    <span className="typing-caret" aria-hidden="true" />
+                    {!gameOver && <span className="typing-caret" aria-hidden="true" />}
                   </div>
                   <input
                     ref={inputRef}
