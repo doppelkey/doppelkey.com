@@ -70,7 +70,6 @@ export default function Account() {
         </header>
         <div className="content-wrap leaderboard-section">
           <p className="eyebrow">YOUR ACCOUNT</p>
-          <h1 className="leaderboard-title">Account</h1>
 
           {ready && !session && (
             <p className="leaderboard-sub">
