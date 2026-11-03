@@ -69,8 +69,6 @@ export default function Account() {
           </nav>
         </header>
         <div className="content-wrap leaderboard-section">
-          <p className="eyebrow">YOUR ACCOUNT</p>
-
           {ready && !session && (
             <p className="leaderboard-sub">
               <button className="link-button" type="button" onClick={() => signInWithGoogle()}>
