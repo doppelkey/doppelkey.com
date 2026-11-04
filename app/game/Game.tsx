@@ -391,10 +391,10 @@ export default function Game() {
   }, [ready, gameOver]);
 
   // Physical keyboard: digit keys 2-9 multi-tap exactly like the on-screen
-  // keypad (same cycling and timing). Digits that are not part of the served
-  // puzzle are ignored. Backspace deletes a letter, Enter adds the word.
-  // Nothing here fires while typing in a form field or while the sign-in
-  // overlay is open.
+  // keypad (same cycling and timing), including digits outside the served
+  // puzzle, whose letters show faded and cannot be submitted. Backspace
+  // deletes a letter, Enter adds the word. Nothing here fires while typing
+  // in a form field or while the sign-in overlay is open.
   useEffect(() => {
     if (!ready || gameOver) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -411,7 +411,6 @@ export default function Game() {
       }
       if (document.querySelector("[data-auth-overlay]")) return;
       if (/^[2-9]$/.test(event.key)) {
-        if (!digits.includes(event.key)) return;
         event.preventDefault();
         pressKeypadKey(event.key);
       } else if (event.key === "Backspace") {
@@ -424,7 +423,7 @@ export default function Game() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [ready, gameOver, digits, pressKeypadKey, backspaceWord, addWord]);
+  }, [ready, gameOver, pressKeypadKey, backspaceWord, addWord]);
 
   // Definitions come from the Datamuse API (https://datamuse.com/api/). Free
   // without a key until 2027-02-01, after which an API key is required
