@@ -32,6 +32,7 @@ function Header() {
   return (
     <header className="site-header">
       <a className="brand" href="#top">
+        <img src="/doppelkey-icon.svg" alt="" className="brand-icon" />
         Doppelkey
       </a>
       <nav className="main-nav">
@@ -211,7 +212,7 @@ export default function Home() {
       <footer className="site-footer">
         <div className="content-wrap footer-content">
           <div>
-            <strong>Doppelkey</strong>
+            <strong><img src="/doppelkey-icon.svg" alt="" className="brand-icon" />Doppelkey</strong>
             <small>© 2026 Doppelkey. A daily digit word puzzle.</small>
           </div>
           <nav>

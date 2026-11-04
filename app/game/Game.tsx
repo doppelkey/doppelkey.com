@@ -426,6 +426,7 @@ export default function Game() {
       <section className="game-section">
         <header className="site-header">
           <Link className="brand" href="/">
+            <img src="/doppelkey-icon.svg" alt="" className="brand-icon" />
             Doppelkey
           </Link>
           <nav className="main-nav">

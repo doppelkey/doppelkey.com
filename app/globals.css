@@ -75,6 +75,14 @@ h3,
 }
 .brand {
   font-size: 1.35vw;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+}
+.brand-icon {
+  height: 1.5em;
+  width: auto;
+  display: block;
 }
 .main-nav {
   display: flex;
@@ -390,10 +398,15 @@ h1 {
   align-items: flex-end;
 }
 .footer-content strong {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
   font-family: var(--font-krona-one), sans-serif;
   font-weight: 400;
   font-size: 0.9vw;
+}
+.footer-content strong .brand-icon {
+  height: 1.6em;
 }
 .footer-content small {
   display: block;
@@ -420,6 +433,18 @@ h1 {
   }
   .main-nav a:not(.button) {
     display: none;
+  }
+  .hero-section .site-header {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 72px;
+    padding: 10px 0;
+    row-gap: 10px;
+  }
+  .hero-section .main-nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 8px;
   }
   .hero-section {
     min-height: auto;
