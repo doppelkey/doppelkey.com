@@ -212,7 +212,7 @@ h1 {
 .key-summary {
   margin: 0;
   font-size: 1.2vw;
-  font-family: var(--font-paytone-one), sans-serif;
+  font-family: var(--font-krona-one), sans-serif;
 }
 .keypad {
   display: grid;
@@ -359,7 +359,7 @@ h1 {
   padding: 2.2vw 2.7vw;
 }
 .word-example strong {
-  font-family: var(--font-paytone-one), sans-serif;
+  font-family: var(--font-krona-one), sans-serif;
   font-size: 1.8vw;
 }
 .word-list {
@@ -634,7 +634,7 @@ h1 {
 }
 .game-timer {
   margin: 0;
-  font-family: var(--font-paytone-one), sans-serif;
+  font-family: var(--font-krona-one), sans-serif;
   font-size: clamp(32px, 3vw, 40px);
   line-height: 1;
 }
@@ -679,7 +679,7 @@ h1 {
 }
 .panel-keypad .typing-word {
   min-height: 1em;
-  font-family: var(--font-paytone-one), sans-serif;
+  font-family: var(--font-krona-one), sans-serif;
   font-size: 4.2vw;
   line-height: 1;
   letter-spacing: 0.02em;
@@ -692,8 +692,9 @@ h1 {
   display: none;
 }
 .typing-placeholder {
+  font-size: 0.84em;
   color: #9a9da5;
-  font-family: var(--font-paytone-one), sans-serif;
+  font-family: var(--font-krona-one), sans-serif;
   letter-spacing: 0;
 }
 .game-actions {
@@ -832,7 +833,7 @@ h1 {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-paytone-one), sans-serif;
+  font-family: var(--font-krona-one), sans-serif;
   font-size: clamp(56px, 5vw, 72px);
   line-height: 1;
   color: var(--orange);
@@ -911,7 +912,7 @@ h1 {
     font-size: 11vw;
   }
   .typing-placeholder {
-    font-family: var(--font-paytone-one), sans-serif;
+    font-family: var(--font-krona-one), sans-serif;
   }
   .game-actions {
     margin-top: 12px;
@@ -1293,7 +1294,7 @@ h1 {
 }
 .leaderboard-stats strong {
   display: block;
-  font-family: var(--font-paytone-one), sans-serif;
+  font-family: var(--font-krona-one), sans-serif;
   font-weight: 400;
   font-size: 28px;
 }
