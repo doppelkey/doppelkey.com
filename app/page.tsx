@@ -151,6 +151,10 @@ function HowItWorks() {
 export default function Home() {
   return (
     <div className="page-shell" id="top">
+      <meta
+        name="listdle-verification"
+        content="3a1a8906-7b03-487a-b47f-a461c90d0972"
+      ></meta>
       <section className="hero-section">
         <Header />
         <div className="content-wrap hero-content">
@@ -158,14 +162,15 @@ export default function Home() {
             <h1>
               Build words
               <br />
-              from four<br />
+              from four
+              <br />
               digits
             </h1>
             <p className="hero-description">
-              Four unique digits are your only clues. Use their letters to
-              build words of four or more letters, reusing any letter as often
-              as you like. Longer words score more: 1 point for four letters,
-              plus 1 for each extra letter.
+              Four unique digits are your only clues. Use their letters to build
+              words of four or more letters, reusing any letter as often as you
+              like. Longer words score more: 1 point for four letters, plus 1
+              for each extra letter.
             </p>
             <div className="hero-actions">
               <a className="button" href="/game">
@@ -186,8 +191,9 @@ export default function Home() {
             <h2>Four digits, many words</h2>
             <p>
               Start with 2, 4, 7, and 9. Their letters can make airy, ways,
-              wiry, hair, and more. Repeat letters and digits freely, but every word must
-              be at least four letters long. AIRY is worth 1 point, HAIRY 2, and AIRWAYS 4.
+              wiry, hair, and more. Repeat letters and digits freely, but every
+              word must be at least four letters long. AIRY is worth 1 point,
+              HAIRY 2, and AIRWAYS 4.
             </p>
           </div>
           <div className="word-example">
@@ -212,7 +218,10 @@ export default function Home() {
       <footer className="site-footer">
         <div className="content-wrap footer-content">
           <div>
-            <strong><img src="/doppelkey-icon.svg" alt="" className="brand-icon" />Doppelkey</strong>
+            <strong>
+              <img src="/doppelkey-icon.svg" alt="" className="brand-icon" />
+              Doppelkey
+            </strong>
             <small>© 2026 Doppelkey. A daily digit word puzzle.</small>
           </div>
           <nav>
@@ -220,7 +229,13 @@ export default function Home() {
             <a href="#archive">Examples</a>
             <a href="#about">About</a>
             <a href="/privacy">Privacy</a>
-            <a href="https://github.com/doppelkey/doppelkey.com/issues" target="_blank" rel="noreferrer">Contact</a>
+            <a
+              href="https://github.com/doppelkey/doppelkey.com/issues"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Contact
+            </a>
           </nav>
         </div>
       </footer>
