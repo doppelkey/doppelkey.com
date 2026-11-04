@@ -1,51 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Doppelkey
 
-## Getting Started
+A daily digit word puzzle at [doppelkey.com](https://doppelkey.com).
 
-First, run the development server:
+Every day you get four unique digits. Each digit maps to letters on a
+phone-style keypad (2 = ABC, 3 = DEF, and so on). Build as many real words
+of four or more letters as you can in three minutes, reusing any letter or
+digit as often as you like. Longer words score more: a four-letter word is
+1 point, and every extra letter adds 1 more (AIRY = 1, HAIRY = 2,
+AIRWAYS = 4).
+
+## Playing
+
+- **Practice** - just open the site and play. Words are checked in the
+  browser against the bundled dictionary.
+- **Ranked** - sign in with Google to play the day's ranked round. One
+  attempt per player per day: the server issues the digits and the deadline,
+  checks each word against its own copy of the dictionary and computes the
+  score. Ranked scores feed the daily leaderboard, which resets at midnight
+  IST.
+- **Streaks** - starting a ranked round on consecutive IST days builds your
+  streak; a missed day resets it.
+- **Account** - pick a unique username for the leaderboard and edit it any
+  time.
+
+## Stack
+
+- Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4
+- Supabase: Google sign-in (Auth), Postgres with row-level security, and RPC
+  functions for rounds, stats and the leaderboard
+- Production hosting on Vercel, DNS managed in Cloudflare
+
+## Project structure
+
+- `app/` - routes and components: the landing page, `/game`, `/leaderboard`,
+  `/account` and `/privacy`
+- `lib/` - Supabase client (`lib/supabase.ts`), auth hook and username helpers
+- `supabase/migrations/` - schema, row-level security and database functions
+- `scripts/load-dictionary.mjs` - loads the wordlist into the database
+- `public/wordlist.txt` - the full offline dictionary (Letterpress-derived,
+  ~273k words; sources and licenses in `public/wordlist.LICENSE.txt`)
+
+Definitions on the time-up screen come from the
+[Datamuse API](https://datamuse.com/api/) at runtime; it is free without an
+API key until 2027-02-01, after which a key is required (100,000 requests/day
+per key).
+
+## Running locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open [http://localhost:3000](http://localhost:3000). Other scripts:
+`npm run build`, `npm start`, `npm run lint`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The browser only needs the Supabase project URL and publishable key:
 
-## Learn More
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
-To learn more about Next.js, take a look at the following resources:
+Both are public by design and have working defaults in `lib/supabase.ts`, so
+local development needs no setup. Row-level security and the database
+functions decide what signed-in and anonymous visitors can do. Never add a
+secret (service-role) key to the app or this repo.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`scripts/load-dictionary.mjs` additionally needs `SUPABASE_ACCESS_TOKEN` and
+`SUPABASE_PROJECT_REF` in the environment.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Database
 
-## Deploy on Vercel
+`supabase/migrations/` holds the schema (`dictionary`, `profiles`,
+`daily_puzzles`, `rounds`), row-level security and the functions the app
+calls: `get_daily_puzzle`, `start_round`, `finish_round`, `my_stats`,
+`get_leaderboard`, `set_display_name`. The day boundary is midnight IST.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Privacy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The privacy policy lives at [/privacy](https://doppelkey.com/privacy) and
+covers what the app stores: Google sign-in details, your username, game
+activity and the public leaderboard.
 
-## Wordlist and definitions
+## Contact
 
-`public/wordlist.txt` is Doppelkey's full offline wordlist (the Letterpress-derived list, 273k words) (see
-`public/wordlist.LICENSE.txt` for sources and licenses). Definitions on the
-time-up screen come from the [Datamuse API](https://datamuse.com/api/) at
-runtime; it is free without an API key until 2027-02-01, after which a key is
-required (100,000 requests/day per key).
-
-## Accounts, ranked rounds and leaderboards (Supabase)
-
-- Login: Google through Supabase Auth. The browser only uses the project URL and the publishable key (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, both safe to expose; defaults are in `lib/supabase.ts`). Never add a secret key to the app or this repo.
-- Database: `supabase/migrations/*.sql` holds the schema, row-level security and the functions the app calls. The day resets at midnight IST; each player gets one ranked round per day. The server records the round start, checks words against its own copy of the dictionary and computes the score.
-- `scripts/load-dictionary.mjs` loads `public/wordlist.txt` into the database (needs `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_REF` in the environment).
-- Streak: consecutive IST days on which a player started a ranked round. A missed IST day resets it.
+Open an issue on this repo. Issues are public, so please don't include your
+email address or other account details.
