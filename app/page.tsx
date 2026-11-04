@@ -219,7 +219,7 @@ export default function Home() {
             <a href="#archive">Examples</a>
             <a href="#about">About</a>
             <a href="/privacy">Privacy</a>
-            <a href="#contact">Contact</a>
+            <a href="https://github.com/doppelkey/doppelkey.com/issues" target="_blank" rel="noreferrer">Contact</a>
           </nav>
         </div>
       </footer>

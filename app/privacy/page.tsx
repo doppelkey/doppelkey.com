@@ -26,7 +26,7 @@ export default function PrivacyPage() {
         </header>
         <div className="content-wrap privacy-section">
           <h1 className="leaderboard-title">Privacy policy</h1>
-          <p className="privacy-updated">Last updated November 3, 2026</p>
+          <p className="privacy-updated">Last updated November 4, 2026</p>
 
           <p>
             Doppelkey is a daily digit word puzzle. This policy explains what
@@ -148,6 +148,12 @@ export default function PrivacyPage() {
               our GitHub repository
             </a>
             .
+          </p>
+          <p>
+            GitHub issues are public, so do not include your email address
+            or other account details in what you post. If we need to confirm
+            it is really you before we change or delete anything, we will do
+            that over a private channel.
           </p>
         </div>
       </section>
