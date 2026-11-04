@@ -65,6 +65,30 @@ function dayLabel(day: string) {
   });
 }
 
+
+// Wordle-style share: copy the result card to the clipboard. Falls back to a
+// hidden textarea for browsers without the async clipboard API.
+async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    try {
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand("copy");
+      area.remove();
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}
+
 export default function Game() {
   const { ready: authReady, session } = useAuth();
   const ranked = Boolean(session);
@@ -87,6 +111,8 @@ export default function Game() {
   const [secondsLeft, setSecondsLeft] = useState(ROUND_SECONDS);
   const [keypadSelection, setKeypadSelection] = useState<{ digit: string; index: number } | null>(null);
   const [overlayDismissed, setOverlayDismissed] = useState(false);
+  const [todayRank, setTodayRank] = useState<number | null>(null);
+  const [shareState, setShareState] = useState<"idle" | "copied" | "error">("idle");
   const [definition, setDefinition] = useState<{
     word: string;
     status: "loading" | "ready" | "missing" | "error";
@@ -175,6 +201,8 @@ export default function Game() {
 
   const startRankedRound = () => {
     setStarting(true);
+    setShareState("idle");
+    setTodayRank(null);
     getSupabase()
       .rpc("start_round")
       .then(({ data, error }) => {
@@ -473,6 +501,49 @@ export default function Game() {
       : rankedDone && round?.status === "rejected"
         ? "That round couldn't be verified, so it has no score today."
         : null;
+  // The player's place on today's board, for the share card. Fetched once the
+  // ranked round is finished; if they're outside the top 100 the line is left
+  // out rather than guessed.
+  useEffect(() => {
+    if (!rankedDone || !round || round.status !== "finished") return;
+    let cancelled = false;
+    getSupabase()
+      .rpc("get_leaderboard", { p_day: round.day, p_limit: 100 })
+      .then(({ data }) => {
+        if (cancelled) return;
+        const me = (data as { rank: number; is_me: boolean }[] | null)?.find(
+          (row) => row.is_me
+        );
+        if (me) setTodayRank(me.rank);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [rankedDone, round]);
+
+  const shareText = useMemo(() => {
+    if (!rankedDone || !round || round.status !== "finished") return null;
+    const datePart = new Date(`${round.day}T00:00:00Z`).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    });
+    const parts = [`${round.score} pts`];
+    if (stats) parts.push(`🔥 ${stats.current_streak} day streak`);
+    if (todayRank) parts.push(`#${todayRank} today`);
+    return `Doppelkey ${datePart}
+${parts.join(" · ")}
+Beat me: doppelkey.com`;
+  }, [rankedDone, round, stats, todayRank]);
+
+  const shareResults = () => {
+    if (!shareText) return;
+    copyText(shareText).then((ok) => {
+      setShareState(ok ? "copied" : "error");
+      window.setTimeout(() => setShareState("idle"), 2000);
+    });
+  };
+
   const streakLabel = stats
     ? `${stats.current_streak} day${stats.current_streak === 1 ? "" : "s"}`
     : null;
@@ -756,6 +827,15 @@ export default function Game() {
             {rankedNote && <p className="game-over-copy">{rankedNote}</p>}
             {ranked && streakLabel && (
               <p className="game-over-copy">Streak: {streakLabel}</p>
+            )}
+            {ranked && shareText && (
+              <button className="button button-outline" type="button" onClick={shareResults}>
+                {shareState === "copied"
+                  ? "Copied to clipboard!"
+                  : shareState === "error"
+                    ? "Couldn't copy"
+                    : "Share results"}
+              </button>
             )}
             {ranked && (
               <Link className="button button-outline" href="/leaderboard">
