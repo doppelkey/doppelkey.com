@@ -92,3 +92,7 @@ activity and the public leaderboard.
 
 Open an issue on this repo. Issues are public, so please don't include your
 email address or other account details.
+
+---
+
+[![Listed on relaydle](https://relaydle.com/badge.svg)](https://relaydle.com/)
