@@ -77,6 +77,11 @@ secret (service-role) key to the app or this repo.
 calls: `get_daily_puzzle`, `start_round`, `finish_round`, `my_stats`,
 `get_leaderboard`, `set_display_name`. The day boundary is midnight IST.
 
+Signed-in players get today's puzzle from `get_daily_puzzle`; signed-out
+visitors get yesterday's, so today's ranked digits stay unmemorable until
+played. `get_puzzle(day)` and `get_archive_days()` read past puzzles for the
+archive: past days only, and only days that already exist.
+
 ## Privacy
 
 The privacy policy lives at [/privacy](https://doppelkey.com/privacy) and

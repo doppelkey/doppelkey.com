@@ -42,6 +42,19 @@ function formatTime(totalSeconds: number) {
 // not lose them. The server still validates every word when the round ends.
 const foundStorageKey = (roundId: string) => `doppelkey-found-${roundId}`;
 
+// Today's date on the app's IST clock, as YYYY-MM-DD. Compared against the
+// day the server actually served: before the practice migration is applied a
+// signed-out visitor still gets today's digits, and the copy must not claim
+// otherwise.
+function istToday() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 function dayLabel(day: string) {
   return new Date(`${day}T00:00:00Z`).toLocaleDateString("en-US", {
     weekday: "long",
@@ -57,6 +70,7 @@ export default function Game() {
   const ranked = Boolean(session);
   const userId = session?.user.id;
   const [digits, setDigits] = useState<string[]>([]);
+  const [puzzleDay, setPuzzleDay] = useState("");
   const [dateLabel, setDateLabel] = useState("");
   const [puzzleState, setPuzzleState] = useState<"loading" | "ready" | "error">("loading");
   const [round, setRound] = useState<RankedRound | null>(null);
@@ -93,6 +107,7 @@ export default function Game() {
           return;
         }
         setDigits(puzzle.digits.split("").sort());
+        setPuzzleDay(puzzle.day);
         setDateLabel(dayLabel(puzzle.day));
         setPuzzleState("ready");
       });
@@ -296,6 +311,8 @@ export default function Game() {
   }, [dictionary, allowedLetters]);
 
   const rankedDone = ranked && round !== null && round.status !== "started";
+  // True once the server serves signed-out visitors yesterday's puzzle.
+  const practiceYesterday = !ranked && puzzleDay !== "" && puzzleDay < istToday();
   const gameOver = rankedDone || (ready && secondsLeft <= 0);
   const showGameOverOverlay =
     gameOver && !overlayDismissed && !rankedLive;
@@ -307,8 +324,7 @@ export default function Game() {
     if (showGameOverOverlay) overlayButtonRef.current?.focus();
   }, [showGameOverOverlay]);
 
-  const submitWord = (event: FormEvent) => {
-    event.preventDefault();
+  const addWord = useCallback(() => {
     if (gameOver || !ready) return;
     const word = input.trim().toLowerCase();
     setInput("");
@@ -334,6 +350,11 @@ export default function Game() {
     }
     setFound((words) => [...words, word].sort());
     setFeedback({ tone: "good", text: `${word.toUpperCase()} added.` });
+  }, [gameOver, ready, input, allowedLetters, found, dictionary]);
+
+  const submitWord = (event: FormEvent) => {
+    event.preventDefault();
+    addWord();
   };
 
   useEffect(() => {
@@ -342,7 +363,7 @@ export default function Game() {
     };
   }, []);
 
-  const pressKeypadKey = (digit: string) => {
+  const pressKeypadKey = useCallback((digit: string) => {
     if (!ready || gameOver) return;
     const letters = KEY_LETTERS[digit];
     if (!letters) return;
@@ -355,7 +376,7 @@ export default function Game() {
     setKeypadSelection({ digit, index: nextIndex });
     if (keypadTimerRef.current) clearTimeout(keypadTimerRef.current);
     keypadTimerRef.current = setTimeout(() => setKeypadSelection(null), MULTI_TAP_MS);
-  };
+  }, [ready, gameOver, keypadSelection]);
 
   useEffect(() => {
     // Keep the caret end of the scrolling typing display in view.
@@ -363,11 +384,46 @@ export default function Game() {
     if (el) el.scrollLeft = el.scrollWidth;
   }, [input]);
 
-  const backspaceWord = () => {
+  const backspaceWord = useCallback(() => {
     if (!ready || gameOver) return;
     setInput((value) => value.slice(0, -1));
     setKeypadSelection(null);
-  };
+  }, [ready, gameOver]);
+
+  // Physical keyboard: digit keys 2-9 multi-tap exactly like the on-screen
+  // keypad (same cycling and timing), including digits outside the served
+  // puzzle, whose letters show faded and cannot be submitted. Backspace
+  // deletes a letter, Enter adds the word. Nothing here fires while typing
+  // in a form field or while the sign-in overlay is open.
+  useEffect(() => {
+    if (!ready || gameOver) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (document.querySelector("[data-auth-overlay]")) return;
+      if (/^[2-9]$/.test(event.key)) {
+        event.preventDefault();
+        pressKeypadKey(event.key);
+      } else if (event.key === "Backspace") {
+        event.preventDefault();
+        backspaceWord();
+      } else if (event.key === "Enter") {
+        event.preventDefault();
+        addWord();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [ready, gameOver, pressKeypadKey, backspaceWord, addWord]);
 
   // Definitions come from the Datamuse API (https://datamuse.com/api/). Free
   // without a key until 2027-02-01, after which an API key is required
@@ -443,7 +499,11 @@ export default function Game() {
         <div className="content-wrap">
           <div className="game-hero">
             <p className="eyebrow">
-              {ranked ? "TODAY'S RANKED PUZZLE" : "TODAY'S PUZZLE"}
+              {ranked
+                ? "TODAY'S RANKED PUZZLE"
+                : practiceYesterday
+                  ? "YESTERDAY'S PRACTICE PUZZLE"
+                  : "PRACTICE PUZZLE"}
             </p>
             <h1 className="game-digits">
               {puzzleState === "ready" ? digits.join(" · ") : "· · · ·"}
@@ -451,11 +511,13 @@ export default function Game() {
             <p className="game-date">{puzzleState === "ready" ? dateLabel : "Loading"}</p>
             {authReady && !ranked && (
               <p className="game-mode-note">
-                Practice round, not saved.{" "}
+                {practiceYesterday
+                  ? "Signed-out practice uses yesterday's digits, so today's ranked puzzle stays a surprise. It is not saved. "
+                  : "Practice round, not saved. "}
                 <button className="link-button" type="button" onClick={() => openAuthOverlay("signin")}>
                   Sign in
                 </button>{" "}
-                to play your one ranked round today, keep a streak and join the
+                to play today&apos;s ranked round, keep a streak and join the
                 leaderboard.
               </p>
             )}
@@ -478,7 +540,13 @@ export default function Game() {
             </div>
             <div className="game-panel panel-keypad">
               <div className="puzzle-header">
-                <p className="panel-label">Today&apos;s keypad</p>
+                <p className="panel-label">
+                  {ranked
+                    ? "Today's keypad"
+                    : practiceYesterday
+                      ? "Yesterday's keypad"
+                      : "Practice keypad"}
+                </p>
                 <p className="key-summary">
                   {puzzleState === "ready" ? digits.join(" · ") : ""}
                 </p>

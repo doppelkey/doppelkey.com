@@ -286,6 +286,7 @@ export default function AuthOverlay() {
   return (
     <div
       className="auth-overlay"
+      data-auth-overlay=""
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !busy) setOpen(false);
       }}
