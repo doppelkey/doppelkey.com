@@ -6,10 +6,10 @@ import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "re
 import AuthButton from "../AuthButton";
 import {
   getSupabase,
-  signInWithGoogle,
   type MyStats,
   type RankedRound,
 } from "@/lib/supabase";
+import { openAuthOverlay } from "@/lib/auth-overlay";
 import { useAuth } from "@/lib/useAuth";
 
 const KEYS: [string, string][] = [
@@ -452,8 +452,8 @@ export default function Game() {
             {authReady && !ranked && (
               <p className="game-mode-note">
                 Practice round, not saved.{" "}
-                <button className="link-button" type="button" onClick={() => signInWithGoogle()}>
-                  Sign in with Google
+                <button className="link-button" type="button" onClick={() => openAuthOverlay("signin")}>
+                  Sign in
                 </button>{" "}
                 to play your one ranked round today, keep a streak and join the
                 leaderboard.

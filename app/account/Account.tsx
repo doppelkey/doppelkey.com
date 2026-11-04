@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import AuthButton from "../AuthButton";
-import { getSupabase, signInWithGoogle, type MyStats } from "@/lib/supabase";
+import { getSupabase, type MyStats } from "@/lib/supabase";
+import { openAuthOverlay } from "@/lib/auth-overlay";
 import { useAuth } from "@/lib/useAuth";
 import { NAME_RULES, saveUsername } from "@/lib/profile";
 
@@ -88,8 +89,8 @@ export default function Account() {
         <div className="content-wrap leaderboard-section">
           {ready && !session && (
             <p className="leaderboard-sub">
-              <button className="link-button" type="button" onClick={() => signInWithGoogle()}>
-                Sign in with Google
+              <button className="link-button" type="button" onClick={() => openAuthOverlay("signin")}>
+                Sign in
               </button>{" "}
               to see your account.
             </p>
