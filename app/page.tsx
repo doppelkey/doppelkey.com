@@ -224,6 +224,23 @@ export default function Home() {
             </strong>
             <small>© 2026 Doppelkey. A daily digit word puzzle.</small>
           </div>
+          <a
+            href="https://listdle.com/games/doppelkey/"
+            target="_blank"
+            rel="noopener"
+          >
+            <picture>
+              <source
+                media="(prefers-color-scheme: dark)"
+                srcSet="https://listdle.com/badge/doppelkey.svg?style=rate&theme=dark"
+              />
+              <img
+                src="https://listdle.com/badge/doppelkey.svg?style=rate&theme=light"
+                alt="Rate Doppelkey on Listdle"
+                height="56"
+              />
+            </picture>
+          </a>
           <nav>
             <a href="#how-it-works">How to play</a>
             <a href="#archive">Examples</a>
