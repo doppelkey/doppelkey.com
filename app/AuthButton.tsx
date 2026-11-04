@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase, signInWithGoogle, type MyStats } from "@/lib/supabase";
+import { getSupabase, type MyStats } from "@/lib/supabase";
+import { openAuthOverlay } from "@/lib/auth-overlay";
 import { useAuth } from "@/lib/useAuth";
 import { PROFILE_NAME_CHANGED } from "@/lib/profile";
 
@@ -37,13 +38,22 @@ export default function AuthButton() {
 
   if (!session) {
     return (
-      <button
-        className="button button-small button-outline"
-        type="button"
-        onClick={() => signInWithGoogle()}
-      >
-        Sign in
-      </button>
+      <>
+        <button
+          className="button button-small button-outline"
+          type="button"
+          onClick={() => openAuthOverlay("signin")}
+        >
+          Sign in
+        </button>
+        <button
+          className="button button-small"
+          type="button"
+          onClick={() => openAuthOverlay("signup")}
+        >
+          Sign up
+        </button>
+      </>
     );
   }
 

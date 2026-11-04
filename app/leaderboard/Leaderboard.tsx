@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import AuthButton from "../AuthButton";
-import { getSupabase, signInWithGoogle, type MyStats } from "@/lib/supabase";
+import { getSupabase, type MyStats } from "@/lib/supabase";
+import { openAuthOverlay } from "@/lib/auth-overlay";
 import { useAuth } from "@/lib/useAuth";
 
 type Row = {
@@ -182,8 +183,8 @@ export default function Leaderboard() {
 
           {ready && !session && (
             <p className="leaderboard-sub">
-              <button className="link-button" type="button" onClick={() => signInWithGoogle()}>
-                Sign in with Google
+              <button className="link-button" type="button" onClick={() => openAuthOverlay("signin")}>
+                Sign in
               </button>{" "}
               to play ranked rounds and appear here.
             </p>

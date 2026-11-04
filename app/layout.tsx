@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Krona_One, Liter, Noto_Sans } from "next/font/google";
 import "./globals.css";
+import AuthOverlay from "./AuthOverlay";
 
 const notoSans = Noto_Sans({
   variable: "--font-noto-sans",
@@ -29,7 +30,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${notoSans.variable} ${kronaOne.variable} ${liter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <AuthOverlay />
+      </body>
     </html>
   );
 }
